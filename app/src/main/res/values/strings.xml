@@ -2,4 +2,6 @@
     <string name="app_name">SproutLeaf</string>
     <string name="auth_email_hint">Email</string>
     <string name="auth_password_hint">Password</string>
+    <string name="auth_login_failed">You email or password were incorrect.</string>
+    <string name="auth_register_failed">There was an error creating an account.</string>
 </resources>
