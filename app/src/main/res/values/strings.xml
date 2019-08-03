@@ -4,4 +4,10 @@
     <string name="auth_password_hint">Password</string>
     <string name="auth_login_failed">You email or password were incorrect.</string>
     <string name="auth_register_failed">There was an error creating an account.</string>
+    <string name="give_name_prompt_text">Hi! What is your name?</string>
+    <string name="give_name_hint_text">Enter your name here</string>
+    <string name="auth_tagline">Dedicated to making your plant thrive!</string>
+    <string name="auth_register_button_text">Register</string>
+    <string name="auth_sign_in_button_text">Sign In</string>
+    <string name="fragment_give_name_button_text">Submit</string>
 </resources>
