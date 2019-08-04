@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser user = mAuth.getCurrentUser();
         String name = user.getDisplayName();
-        if (name == "" || name == null) {
+        if (name == null) {
             showEditDialog();
         }
     }
@@ -34,5 +34,4 @@ public class MainActivity extends AppCompatActivity {
         GiveNameDialogFragment editNameDialogFragment = GiveNameDialogFragment.newInstance("Provide Your Name");
         editNameDialogFragment.show(fm, "fragment_give_name");
     }
-
 }

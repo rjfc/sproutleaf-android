@@ -1,22 +1,29 @@
 package com.example.sproutleaf;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class GiveNameDialogFragment extends DialogFragment {
+    private static final String TAG = GiveNameDialogFragment.class.getName();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private EditText mEditText;
+    private EditText mEditEmail;
+    private Button mAuthSubmit;
 
     public void EditNameDialogFragment() {
     }
@@ -33,33 +40,46 @@ public class GiveNameDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.getDialog().setCanceledOnTouchOutside(false); // Do not cancel dialog when outside is touched
-        return inflater.inflate(R.layout.fragment_give_name, container);
+        View rootView  = inflater.inflate(R.layout.fragment_give_name, container);
+        mAuthSubmit = (Button) rootView.findViewById(R.id.give_name_submit);
+
+        // If submit button clicked
+        mAuthSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                submitDisplayName (view);
+            }
+        });
+        return rootView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Get field from view
-        mEditText = (EditText) view.findViewById(R.id.give_name_field);
+        mEditEmail = (EditText) view.findViewById(R.id.give_name_field);
         // Fetch arguments from bundle and set title
         String title = getArguments().getString("title", "Enter Name");
         getDialog().setTitle(title);
         // Show soft keyboard automatically and request focus to field
-        mEditText.requestFocus();
+        mEditEmail.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     public void submitDisplayName (View view) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String displayName = mEditText.getText().toString();
+        FirebaseUser user = mAuth.getCurrentUser();
+        String displayName = mEditEmail.getText().toString();
 
         // Update display name
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(displayName).build();
-        user.updateProfile(profileUpdates);
-
-        // If display name has been set, dismiss the dialog
-        if (user.getDisplayName() != "") {
-            getDialog().dismiss();
-        }
+        user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "User display name updated.");
+                    getDialog().dismiss();
+                }
+            }
+        });
     }
 }

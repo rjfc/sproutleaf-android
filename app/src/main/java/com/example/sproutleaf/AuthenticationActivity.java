@@ -11,11 +11,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
 public class AuthenticationActivity extends AppCompatActivity {
@@ -24,7 +29,7 @@ public class AuthenticationActivity extends AppCompatActivity {
     private EditText mEmailField;
     private EditText mPasswordField;
     private TextView mStatusTextView;
-
+    private AuthenticatingSpinnerFragment authDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +82,10 @@ public class AuthenticationActivity extends AppCompatActivity {
         return valid;
     }
 
+    public void AuthError(String error) {
+        mStatusTextView.setText(error);
+    }
+
     public void createAccount(View view) {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
@@ -85,19 +94,31 @@ public class AuthenticationActivity extends AppCompatActivity {
         if (!validateForm()) {
             return;
         }
+        showAuthDialog(); // Show auth spinner
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                hideAuthDialog(); // Hide auth spinner
                 if (task.isSuccessful()) {
-                    // Sign in success, update UI with the signed-in user's information
+                    // Sign up success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmailAndPassword:success");
                     FirebaseUser user = mAuth.getCurrentUser();
                     updateUI(user);
                 } else {
-                    // If sign in fails, display a message to the user.
+                    // If sign up fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmailAndPassword:failure", task.getException());
-                    mStatusTextView.setText(R.string.auth_register_failed);
+                    AuthError(getString(R.string.auth_register_failed));
                     updateUI(null);
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof FirebaseAuthUserCollisionException) {
+                    String errorCode = ((FirebaseAuthUserCollisionException) e).getErrorCode();
+                    if (errorCode.equals("ERROR_EMAIL_ALREADY_IN_USE") || errorCode.equals("ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL")) {
+                        AuthError(getString(R.string.auth_account_exists));
+                    }
                 }
             }
         });
@@ -111,9 +132,11 @@ public class AuthenticationActivity extends AppCompatActivity {
         if (!validateForm()) {
             return;
         }
+        showAuthDialog(); // Show auth spinner
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                hideAuthDialog(); // Hide auth spinner
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmailAndPassword:success");
@@ -122,10 +145,47 @@ public class AuthenticationActivity extends AppCompatActivity {
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmailAndPassword:failure", task.getException());
-                    mStatusTextView.setText(R.string.auth_login_failed);
+                    AuthError(getString(R.string.auth_login_failed));
                     updateUI(null);
                 }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                    AuthError(getString(R.string.auth_invalid_password));
+                } else if (e instanceof FirebaseAuthInvalidUserException) {
+                    String errorCode = ((FirebaseAuthInvalidUserException) e).getErrorCode();
+                    if (errorCode.equals("ERROR_USER_NOT_FOUND")) {
+                        AuthError(getString(R.string.auth_user_not_found));
+                    } else if (errorCode.equals("ERROR_USER_DISABLED")) {
+                        AuthError(getString(R.string.auth_user_disabled));
+                    } else if (errorCode.equals("ERROR_USER_TOKEN_EXPIRED")) {
+                        AuthError(getString(R.string.auth_password_changed));
+                    } else if (errorCode.equals("ERROR_INVALID_USER_TOKEN ")) {
+                        AuthError(getString(R.string.auth_invalid_token));
+                    } else {
+                        AuthError(e.getLocalizedMessage());
+                    }
+                } else if (e instanceof FirebaseAuthUserCollisionException) {
+                    String errorCode = ((FirebaseAuthUserCollisionException) e).getErrorCode();
+                    if (errorCode.equals("ERROR_CREDENTIAL_ALREADY_IN_USE ")) {
+                        AuthError(getString(R.string.auth_error_credential));
+                    }
+                }
+            }
         });
+    }
+
+    // Create dialog instance
+    private void showAuthDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        authDialog = AuthenticatingSpinnerFragment.newInstance("Authenticating...");
+        authDialog.show(fm, "fragment_authenticating_spinner");
+    }
+
+    // Hide dialog
+    private void hideAuthDialog() {
+        authDialog.dismissDialog();
     }
 }

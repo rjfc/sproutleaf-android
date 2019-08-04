@@ -39,13 +39,16 @@ xmlns:tools="http://schemas.android.com/tools"
 
     <TextView
         android:id="@+id/auth_status"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="51dp"
         android:layout_marginLeft="51dp"
+        android:layout_marginEnd="51dp"
+        android:layout_marginRight="51dp"
         android:fontFamily="@font/lato"
         android:textColor="@android:color/holo_red_light"
         app:layout_constraintBottom_toTopOf="@+id/auth_email"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
@@ -144,5 +147,6 @@ xmlns:tools="http://schemas.android.com/tools"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/auth_password"
         app:srcCompat="@drawable/sproutleaf_logo_icon" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
