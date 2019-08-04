@@ -1,4 +1,4 @@
-package com.example.sproutleaf;
+package com.sproutleaf.android;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

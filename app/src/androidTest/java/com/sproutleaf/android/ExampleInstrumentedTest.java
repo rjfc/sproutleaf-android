@@ -1,4 +1,4 @@
-package com.example.sproutleaf;
+package com.sproutleaf.android;
 
 import android.content.Context;
 
