@@ -7,40 +7,35 @@
     android:background="@color/darkGrey"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/prediction_image"
+        android:layout_width="wrap_content"
+        android:layout_height="345dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="88dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/prediction_heading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:fontFamily="@font/lato_light"
-        android:text="@string/activity_main_heading_text"
+        android:text="@string/prediction_heading_text"
         android:textColor="@color/colorPrimary"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/main_diagnose_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="88dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginRight="24dp"
-        android:background="@color/colorPrimary"
-        android:fontFamily="@font/lato"
-        android:text="@string/activity_main_diagnose_button_text"
-        android:onClick="capturePlant"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/prediction_info" />
+        app:layout_constraintTop_toBottomOf="@+id/prediction_image" />
 
     <TextView
         android:id="@+id/prediction_info"
@@ -53,10 +48,10 @@
         android:layout_marginRight="46dp"
         android:fontFamily="@font/lato"
         android:gravity="center"
-        android:text="@string/activity_main_info_text"
         android:textAllCaps="false"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/prediction_heading" />
 
@@ -64,7 +59,7 @@
         android:id="@+id/prediction_sproutleaf_logo"
         android:layout_width="42dp"
         android:layout_height="121dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:rotation="20"

@@ -5,11 +5,15 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,10 +24,12 @@ import java.io.File;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private String mCurrentPhotoPath;
-
     static final int REQUEST_TAKE_PHOTO = 1;
+    private ImageDecoder.Source mImageDecoderSource;
+    private String mCurrentPhotoPath;
+    private ImageView mImageView;
+
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,5 +93,18 @@ public class MainActivity extends AppCompatActivity {
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    // On result of activity launched from intent
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If requestCode = camera app launched
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            // Send path as intent
+            Log.d("image", mCurrentPhotoPath);
+            Intent intent = new Intent(this, PredictionResultActivity.class);
+            intent.putExtra("capturedPhotoPath", mCurrentPhotoPath);
+            startActivity(intent);
+        }
     }
 }
