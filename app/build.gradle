@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.0"
     defaultConfig {
         applicationId 'com.sproutleaf.android'
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -16,6 +16,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+    aaptOptions {
+        noCompress "tflite"  // Do not compress .tflite file
     }
 }
 
@@ -28,6 +31,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.firebase:firebase-core:17.0.0'
     implementation 'com.google.firebase:firebase-auth:18.1.0' // Firebase auth
+    implementation 'com.google.firebase:firebase-ml-model-interpreter:20.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin

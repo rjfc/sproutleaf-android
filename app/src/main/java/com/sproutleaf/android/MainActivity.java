@@ -25,9 +25,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
-    private ImageDecoder.Source mImageDecoderSource;
     private String mCurrentPhotoPath;
-    private ImageView mImageView;
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
@@ -101,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         // If requestCode = camera app launched
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             // Send path as intent
-            Log.d("image", mCurrentPhotoPath);
             Intent intent = new Intent(this, PredictionResultActivity.class);
             intent.putExtra("capturedPhotoPath", mCurrentPhotoPath);
             startActivity(intent);
