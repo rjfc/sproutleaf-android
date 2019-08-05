@@ -175,6 +175,7 @@ public class PredictionResultActivity extends AppCompatActivity {
     private void updatePredictionInfo(float[] probabilities) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String displayName = user.getDisplayName();
+        Log.i("TAG", "probability:" + probabilities[0]);
         if (probabilities[0] >= 0.99999) {
             // Doing great
             mPredictionInfo.setText(String.format(getString(R.string.prediction_info_text_healthy), displayName));

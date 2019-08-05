@@ -23,4 +23,5 @@
     <string name="prediction_info_text_healthy">Your plant looks to be healthy! You\'re doing great, %1$s!</string>
     <string name="prediction_info_text_attention">Your plant isn\'t in need of urgent attention, but could be better!</string>
     <string name="prediction_info_text_urgent">Your plant is in need of urgent attention!</string>
+    <string name="prediction_summary_subheader_text">Our predictions are never 100% accurate.</string>
 </resources>
