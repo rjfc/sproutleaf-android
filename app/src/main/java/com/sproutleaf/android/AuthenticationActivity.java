@@ -38,6 +38,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
+        // Set member variables
         mEmailField = findViewById(R.id.auth_email);
         mPasswordField = findViewById(R.id.auth_password);
         mStatusTextView = findViewById(R.id.auth_status);
@@ -56,6 +57,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         if (user != null) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 

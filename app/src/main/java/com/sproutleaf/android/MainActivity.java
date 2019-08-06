@@ -1,7 +1,9 @@
 package com.sproutleaf.android;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
@@ -14,6 +16,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,21 +30,33 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     private String mCurrentPhotoPath;
-
+    private androidx.appcompat.widget.Toolbar mToolbar;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Set member variables
+        mToolbar = findViewById(R.id.main_toolbar);
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
         FirebaseUser user = mAuth.getCurrentUser();
-        String name = user.getDisplayName();
-        if (name == null) {
+        String displayName = user.getDisplayName();
+
+        // Toolbar config
+        mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.darkerGrey, null));
+        mToolbar.setTitleTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null));
+        mToolbar.setTitle(getResources().getString(R.string.main_toolbar_text));
+        mToolbar.setTitleTextAppearance(this, R.style.ToolbarTextAppearance);
+        setSupportActionBar(mToolbar); // Set mToolbar as Action Bar
+
+        if (displayName == null) {
             showGiveNameDialog();
         }
     }
@@ -95,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     // On result of activity launched from intent
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
         // If requestCode = camera app launched
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             // Send path as intent
@@ -103,5 +119,17 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("capturedPhotoPath", mCurrentPhotoPath);
             startActivity(intent);
         }
+    }
+
+    public void logOut (View view) {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, AuthenticationActivity.class);
+        startActivity(intent);
+    }
+
+    // Launch activity_journal.xml
+    public void launchJournal (View view) {
+        Intent intent = new Intent(this, JournalActivity.class);
+        startActivity(intent);
     }
 }
