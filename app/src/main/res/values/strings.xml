@@ -19,6 +19,7 @@
     <string name="auth_error_credential">There was an error linking this account to another account of yours that has already been made.</string>
     <string name="activity_main_heading_text">Welcome to SproutLeaf!</string>
     <string name="activity_main_diagnose_button_text">Diagnose my Plant</string>
+    <string name="activity_main_journal_button_text">Plant Journal</string>
     <string name="activity_main_info_text">By running an image of your plant through a trained neural network, we can make a prediction about whether your plant needs attention or not.\n\nClick the button below to start.</string>
     <string name="prediction_info_text_healthy">Your plant looks to be healthy! You\'re doing great, %1$s!</string>
     <string name="prediction_info_text_attention">Your plant isn\'t in need of urgent attention, but could be better!</string>
