@@ -40,8 +40,8 @@ public class GiveNameDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setCancelable(false); // Do no cancel dialog when back button pressed
-        View rootView  = inflater.inflate(R.layout.fragment_give_name, container);
-        mAuthSubmit = (Button) rootView.findViewById(R.id.give_name_submit);
+        View rootView  = inflater.inflate(R.layout.fragment_create_plant, container);
+        mAuthSubmit = rootView.findViewById(R.id.give_name_submit);
 
         // If submit button clicked
         mAuthSubmit.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +66,7 @@ public class GiveNameDialogFragment extends DialogFragment {
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
-    public void submitDisplayName (View view) {
+    public void submitDisplayName(View view) {
         FirebaseUser user = mAuth.getCurrentUser();
         String displayName = mEditEmail.getText().toString();
 
@@ -75,10 +75,10 @@ public class GiveNameDialogFragment extends DialogFragment {
         user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "User display name updated.");
-                    getDialog().dismiss();
-                }
+            if (task.isSuccessful()) {
+                Log.d(TAG, "User display name updated.");
+                getDialog().dismiss();
+            }
             }
         });
     }

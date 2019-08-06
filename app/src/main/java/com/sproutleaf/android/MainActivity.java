@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onStart() {
+    public void onStart(){
         super.onStart();
 
         FirebaseUser user = mAuth.getCurrentUser();
@@ -62,14 +62,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Show give name dialog
-    private void showGiveNameDialog() {
+    private void showGiveNameDialog(){
         FragmentManager fm = getSupportFragmentManager();
-        GiveNameDialogFragment editNameDialogFragment = GiveNameDialogFragment.newInstance("Provide Your Name");
-        editNameDialogFragment.show(fm, "fragment_give_name");
+        GiveNameDialogFragment giveNameDialogFragment = GiveNameDialogFragment.newInstance("Provide Your Name");
+        giveNameDialogFragment.show(fm, "fragment_give_name");
     }
 
     // Function to call when diagnose plant button clicked
-    public void capturePlant (View view) {
+    public void capturePlant(View view) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     // On result of activity launched from intent
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // If requestCode = camera app launched
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             // Send path as intent
@@ -121,14 +121,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void logOut (View view) {
+    public void logOut(View view) {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(this, AuthenticationActivity.class);
         startActivity(intent);
     }
 
     // Launch activity_journal.xml
-    public void launchJournal (View view) {
+    public void launchJournal(View view) {
         Intent intent = new Intent(this, JournalActivity.class);
         startActivity(intent);
     }

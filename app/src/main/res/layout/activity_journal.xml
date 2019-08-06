@@ -13,6 +13,23 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/new_plant_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="#00FFFFFF"
+            android:fontFamily="@font/lato"
+            android:onClick="showNewPlantDialog"
+            android:paddingLeft="27dp"
+            android:text="@string/new_plant_button_text"
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="323dp"
+            tools:layout_editor_absoluteY="4dp" />
     </androidx.appcompat.widget.Toolbar>
 
 

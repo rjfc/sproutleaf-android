@@ -33,7 +33,7 @@ public class PredictingSpinnerFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    public void dismissDialog () {
+    public void dismissDialog() {
         getDialog().dismiss();
     }
 }

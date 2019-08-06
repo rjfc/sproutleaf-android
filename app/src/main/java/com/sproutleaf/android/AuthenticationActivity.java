@@ -53,7 +53,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
-    private void updateUI (FirebaseUser user) {
+    private void updateUI(FirebaseUser user) {
         if (user != null) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

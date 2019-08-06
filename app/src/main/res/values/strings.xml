@@ -29,5 +29,13 @@
     <string name="authenticating_spinner_text">Authenticating…</string>
     <string name="main_toolbar_text">Home</string>
     <string name="journal_toolbar_text">%1$s\'s Plants</string>
-    <string name="log_out_text">Log Out</string>
+    <string name="log_out_button_text">Log Out</string>
+    <string name="new_plant_button_text">+</string>
+    <string name="create_plant_title_text">New Plant Profile</string>
+    <string name="give_plant_name_prompt_text">Give your plant a name!</string>
+    <string name="give_plant_name_hint_text">e.g. George</string>
+    <string name="give_plant_species_prompt_text">What is the species of your plant?</string>
+    <string name="give_plant_species_hint_text">e.g. Peace Lily</string>
+    <string name="give_plant_birthday_prompt_text">When is your plant\'s birthday?</string>
+    <string name="give_plant_birthday_hint_text">e.g. 6/12/2018</string>
 </resources>
