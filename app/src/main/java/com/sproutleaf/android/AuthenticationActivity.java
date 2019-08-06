@@ -28,7 +28,7 @@ public class AuthenticationActivity extends AppCompatActivity {
     private EditText mEmailField;
     private EditText mPasswordField;
     private TextView mStatusTextView;
-    private AuthenticatingSpinnerFragment authDialog;
+    private AuthenticatingSpinnerFragment mAuthDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,12 +179,12 @@ public class AuthenticationActivity extends AppCompatActivity {
     // Create dialog instance
     private void showAuthDialog() {
         FragmentManager fm = getSupportFragmentManager();
-        authDialog = AuthenticatingSpinnerFragment.newInstance("Authenticating...");
-        authDialog.show(fm, "fragment_authenticating_spinner");
+        mAuthDialog = AuthenticatingSpinnerFragment.newInstance("Authenticating...");
+        mAuthDialog.show(fm, "fragment_authenticating_spinner");
     }
 
     // Hide dialog
     private void hideAuthDialog() {
-        authDialog.dismissDialog();
+        mAuthDialog.dismissDialog();
     }
 }

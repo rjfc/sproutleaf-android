@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,6 +43,7 @@ public class PredictionResultActivity extends AppCompatActivity {
     private ImageView mCapturedImageView;
     private String mCapturedPhotoPath;
     private TextView mPredictionInfo;
+    private PredictingSpinnerFragment mPredictingDialog;
     private float[] mProbabilities;
 
     @Override
@@ -55,6 +57,8 @@ public class PredictionResultActivity extends AppCompatActivity {
         mCapturedImageView = findViewById(R.id.prediction_image);
         mPredictionInfo = findViewById(R.id.prediction_info);
         super.onStart();
+
+        showPredictionDialog();
 
         try{
             // Get path intent and set image view to image
@@ -191,5 +195,18 @@ public class PredictionResultActivity extends AppCompatActivity {
             mPredictionInfo.setText(getString(R.string.prediction_info_text_urgent));
             mPredictionInfo.setTextColor(getResources().getColor(R.color.urgentRed, null));
         }
+        hidePredictionDialog();
+    }
+
+    // Create dialog instance
+    private void showPredictionDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        mPredictingDialog = PredictingSpinnerFragment.newInstance("Predicting...");
+        mPredictingDialog.show(fm, "fragment_predicting_spinner");
+    }
+
+    // Hide dialog
+    private void hidePredictionDialog() {
+        mPredictingDialog.dismissDialog();
     }
 }
