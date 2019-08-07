@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
@@ -25,8 +27,8 @@ import java.text.SimpleDateFormat;
 
 public class CreatePlantDialogFragment extends DialogFragment {
     private static final String TAG = CreatePlantDialogFragment.class.getName();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+    private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
     private EditText mPlantNameField;
     private EditText mPlantSpeciesField;
     private EditText mPlantBirthdayField;
@@ -53,6 +55,10 @@ public class CreatePlantDialogFragment extends DialogFragment {
         mPlantBirthdayField = rootView.findViewById(R.id.give_plant_birthday_field);
         mProfileSubmit = rootView.findViewById(R.id.plant_profile_submit);
 
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
         // If submit button clicked
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
             String plantName = mPlantNameField.getText().toString();
@@ -65,7 +71,10 @@ public class CreatePlantDialogFragment extends DialogFragment {
                 if (!validateForm()) {
                     return;
                 }
-
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                DatabaseReference plantsReference = mDatabase.child("plants");
+                Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
+                plantsReference.push().setValue(newPlant);
             }
         });
 

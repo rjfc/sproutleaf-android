@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class GiveNameDialogFragment extends DialogFragment {
     private static final String TAG = GiveNameDialogFragment.class.getName();
@@ -40,7 +42,7 @@ public class GiveNameDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setCancelable(false); // Do no cancel dialog when back button pressed
-        View rootView  = inflater.inflate(R.layout.fragment_create_plant, container);
+        View rootView  = inflater.inflate(R.layout.fragment_give_name, container);
         mAuthSubmit = rootView.findViewById(R.id.give_name_submit);
 
         // If submit button clicked
@@ -67,18 +69,18 @@ public class GiveNameDialogFragment extends DialogFragment {
     }
 
     public void submitDisplayName(View view) {
-        FirebaseUser user = mAuth.getCurrentUser();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         String displayName = mEditEmail.getText().toString();
 
         // Update display name
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(displayName).build();
-        user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+        currentUser.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "User display name updated.");
-                    getDialog().dismiss();
-                }
+            if (task.isSuccessful()) {
+                Log.d(TAG, "User display name updated.");
+                getDialog().dismiss();
+            }
             }
         });
     }

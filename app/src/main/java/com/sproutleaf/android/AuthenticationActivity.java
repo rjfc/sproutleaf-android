@@ -57,8 +57,8 @@ public class AuthenticationActivity extends AppCompatActivity {
         updateUI(currentUser);
     }
 
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
+    private void updateUI(FirebaseUser currentUser) {
+        if (currentUser != null) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -149,8 +149,8 @@ public class AuthenticationActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmailAndPassword:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    updateUI(user);
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    updateUI(currentUser);
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmailAndPassword:failure", task.getException());
