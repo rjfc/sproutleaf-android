@@ -13,9 +13,12 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -61,12 +64,13 @@ public class CreatePlantDialogFragment extends DialogFragment {
 
         // If submit button clicked
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
-            String plantName = mPlantNameField.getText().toString();
-            String plantSpecies = mPlantSpeciesField.getText().toString();
-            String plantBirthday = mPlantBirthdayField.getText().toString();
-
             @Override
             public void onClick(View view) {
+                // Update plant in database
+                String plantName = mPlantNameField.getText().toString();
+                String plantSpecies = mPlantSpeciesField.getText().toString();
+                String plantBirthday = mPlantBirthdayField.getText().toString();
+
                 Log.d(TAG, "createPlant:" + plantName + "/" + plantSpecies + "/" + plantBirthday);
                 if (!validateForm()) {
                     return;
@@ -74,7 +78,18 @@ public class CreatePlantDialogFragment extends DialogFragment {
                 FirebaseUser currentUser = mAuth.getCurrentUser();
                 DatabaseReference plantsReference = mDatabase.child("plants");
                 Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
-                plantsReference.push().setValue(newPlant);
+                plantsReference.push().setValue(newPlant).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        getDialog().dismiss();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         });
 
