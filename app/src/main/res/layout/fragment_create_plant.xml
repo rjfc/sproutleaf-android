@@ -131,6 +131,8 @@
         android:inputType="textPersonName"
         android:scrollHorizontally="false"
         android:textSize="18sp"
+        android:focusable="false"
+        android:onClick="openDatePicker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/give_plant_birthday_prompt" />
 

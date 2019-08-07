@@ -1,12 +1,18 @@
 package com.sproutleaf.android;
 
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 
 import androidx.annotation.Nullable;
@@ -14,12 +20,19 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+
 public class CreatePlantDialogFragment extends DialogFragment {
     private static final String TAG = CreatePlantDialogFragment.class.getName();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private EditText mPlantNameField;
+    private EditText mPlantSpeciesField;
+    private EditText mPlantBirthdayField;
     private Button mProfileSubmit;
-
+    private Context mContext;
 
     public void CreatePlantDialogFragment() {
     }
@@ -37,15 +50,49 @@ public class CreatePlantDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView  = inflater.inflate(R.layout.fragment_create_plant, container);
         mPlantNameField = rootView.findViewById(R.id.give_plant_name_field);
+        mPlantBirthdayField = rootView.findViewById(R.id.give_plant_species_field);
         mProfileSubmit = rootView.findViewById(R.id.plant_profile_submit);
+        mPlantBirthdayField = rootView.findViewById(R.id.give_plant_birthday_field);
 
         // If submit button clicked
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
+            String plantName = mPlantNameField.getText().toString();
+            String plantSpecies = mPlantSpeciesField.getText().toString();
+            String plantBirthday = mPlantBirthdayField.getText().toString();
+
             @Override
             public void onClick(View view) {
-                // Todo
+                Log.d(TAG, "createPlant:" + plantName + "/" + plantSpecies + "/" + plantBirthday);
+                if (!validateForm()) {
+                    return;
+                }
+
             }
         });
+
+        // If birthday field button clicked launch datepicker dialog
+        mPlantBirthdayField.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext = view.getContext();
+                final Calendar myCalendar = Calendar.getInstance();
+                DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        // TODO Auto-generated method stub
+                        myCalendar.set(Calendar.YEAR, year);
+                        myCalendar.set(Calendar.MONTH, monthOfYear);
+                        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                        String format = "MMMM dd, yyyy";
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format, Locale.getDefault());
+
+                        mPlantBirthdayField.setText(simpleDateFormat.format(myCalendar.getTime()));
+                    }
+                };
+                new DatePickerDialog(mContext, R.style.DatepickerDialogAppearance, date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
         return rootView;
     }
 
@@ -58,5 +105,19 @@ public class CreatePlantDialogFragment extends DialogFragment {
         // Show soft keyboard automatically and request focus to field
         mPlantNameField.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
+
+    private boolean validateForm() {
+        boolean valid = true;
+
+        String email = mPlantNameField.getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            mPlantNameField.setError("Required.");
+            valid = false;
+        } else {
+            mPlantNameField.setError(null);
+        }
+
+        return valid;
     }
 }

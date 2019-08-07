@@ -75,10 +75,10 @@ public class GiveNameDialogFragment extends DialogFragment {
         user.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-            if (task.isSuccessful()) {
-                Log.d(TAG, "User display name updated.");
-                getDialog().dismiss();
-            }
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "User display name updated.");
+                    getDialog().dismiss();
+                }
             }
         });
     }
