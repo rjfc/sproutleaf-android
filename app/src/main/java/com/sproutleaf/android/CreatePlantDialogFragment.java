@@ -3,11 +3,9 @@ package com.sproutleaf.android;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -19,15 +17,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 
 public class CreatePlantDialogFragment extends DialogFragment {
     private static final String TAG = CreatePlantDialogFragment.class.getName();
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
     private EditText mPlantNameField;
     private EditText mPlantSpeciesField;
     private EditText mPlantBirthdayField;
@@ -50,9 +49,9 @@ public class CreatePlantDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView  = inflater.inflate(R.layout.fragment_create_plant, container);
         mPlantNameField = rootView.findViewById(R.id.give_plant_name_field);
-        mPlantBirthdayField = rootView.findViewById(R.id.give_plant_species_field);
-        mProfileSubmit = rootView.findViewById(R.id.plant_profile_submit);
+        mPlantSpeciesField = rootView.findViewById(R.id.give_plant_species_field);
         mPlantBirthdayField = rootView.findViewById(R.id.give_plant_birthday_field);
+        mProfileSubmit = rootView.findViewById(R.id.plant_profile_submit);
 
         // If submit button clicked
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
