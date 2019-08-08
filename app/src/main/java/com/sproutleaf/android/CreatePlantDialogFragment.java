@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 public class CreatePlantDialogFragment extends DialogFragment {
     private static final String TAG = CreatePlantDialogFragment.class.getName();
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabaseReference;
     private EditText mPlantNameField;
     private EditText mPlantSpeciesField;
     private EditText mPlantBirthdayField;
@@ -60,7 +60,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         // If submit button clicked
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +76,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
                     return;
                 }
                 FirebaseUser currentUser = mAuth.getCurrentUser();
-                DatabaseReference plantsReference = mDatabase.child("plants");
+                DatabaseReference plantsReference = mDatabaseReference.child("plants");
                 Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
                 plantsReference.push().setValue(newPlant).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

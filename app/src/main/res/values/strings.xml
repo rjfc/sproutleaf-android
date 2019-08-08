@@ -38,4 +38,5 @@
     <string name="give_plant_species_hint_text">e.g. Peace Lily</string>
     <string name="give_plant_birthday_prompt_text">When is your plant\'s birthday?</string>
     <string name="give_plant_birthday_hint_text">e.g. 6/12/2018</string>
+    <string name="plant_card_birthday">Born on %1$s</string>
 </resources>
