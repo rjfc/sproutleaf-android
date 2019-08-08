@@ -77,10 +77,9 @@ public class JournalActivity extends AppCompatActivity {
 
                     // Check if plant card is already in list
                     boolean alreadyInList = false;
-                    LinearLayout linearLayout = findViewById(R.id.LinearLayout);
-                    final int childCount = linearLayout.getChildCount();
+                    final int childCount = mLinearLayout.getChildCount();
                     for (int i = 0; i < childCount; i++) {
-                        View view = linearLayout.getChildAt(i);
+                        View view = mLinearLayout.getChildAt(i);
                         if (plantSnapshot.getKey() == view.getTag()) {
                             alreadyInList = true;
                         }
