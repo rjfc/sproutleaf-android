@@ -1,6 +1,7 @@
 package com.sproutleaf.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -71,7 +72,7 @@ public class JournalActivity extends AppCompatActivity {
         mDatabaseReference.child("plants").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
+                for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
                     Plant plant = plantSnapshot.getValue(Plant.class);
 
@@ -125,6 +126,17 @@ public class JournalActivity extends AppCompatActivity {
                         plantCard.addView(plantCardInner);
                         // Finally, add the CardView in root layout
                         mLinearLayout.addView(plantCard);
+
+                        // If plantCard clicked
+                        plantCard.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Send key as intent
+                                Intent intent = new Intent(mContext, PlantProfileActivity.class);
+                                intent.putExtra("capturedPhotoPath", plantSnapshot.getKey());
+                                startActivity(intent);
+                            }
+                        });
                     }
                 }
             }

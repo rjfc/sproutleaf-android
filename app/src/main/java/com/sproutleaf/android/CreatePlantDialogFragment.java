@@ -66,30 +66,30 @@ public class CreatePlantDialogFragment extends DialogFragment {
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Update plant in database
-                String plantName = mPlantNameField.getText().toString();
-                String plantSpecies = mPlantSpeciesField.getText().toString();
-                String plantBirthday = mPlantBirthdayField.getText().toString();
+            // Update plant in database
+            String plantName = mPlantNameField.getText().toString();
+            String plantSpecies = mPlantSpeciesField.getText().toString();
+            String plantBirthday = mPlantBirthdayField.getText().toString();
 
-                Log.d(TAG, "createPlant:" + plantName + "/" + plantSpecies + "/" + plantBirthday);
-                if (!validateForm()) {
-                    return;
+            Log.d(TAG, "createPlant:" + plantName + "/" + plantSpecies + "/" + plantBirthday);
+            if (!validateForm()) {
+                return;
+            }
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            DatabaseReference plantsReference = mDatabaseReference.child("plants");
+            Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
+            plantsReference.push().setValue(newPlant).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    getDialog().dismiss();
                 }
-                FirebaseUser currentUser = mAuth.getCurrentUser();
-                DatabaseReference plantsReference = mDatabaseReference.child("plants");
-                Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
-                plantsReference.push().setValue(newPlant).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        getDialog().dismiss();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    e.printStackTrace();
+                }
+            });
             }
         });
 
