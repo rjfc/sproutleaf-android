@@ -2,27 +2,18 @@ package com.sproutleaf.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import  android.view.ContextThemeWrapper;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.RelativeLayout;
-import android.widget.TextView;;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -38,7 +29,10 @@ public class JournalActivity extends AppCompatActivity {
     private DatabaseReference mDatabaseReference;
     private Context mContext;
     private androidx.appcompat.widget.Toolbar mToolbar;
-    private LinearLayout mLinearLayout;
+    private ViewPager mViewPager;
+
+    private CardPagerAdapter mCardAdapter;
+    private ShadowTransformer mCardShadowTransformer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +45,10 @@ public class JournalActivity extends AppCompatActivity {
 
         // Set member variables
         mContext = getApplicationContext();
-        mLinearLayout = (LinearLayout) findViewById(R.id.LinearLayout);
         mToolbar = findViewById(R.id.journal_toolbar);
+        mViewPager = (ViewPager) findViewById(R.id.viewPager);
+        mCardAdapter = new CardPagerAdapter();
+        mCardShadowTransformer = new ShadowTransformer(mViewPager, mCardAdapter);
     }
 
     @Override
@@ -68,67 +64,36 @@ public class JournalActivity extends AppCompatActivity {
         mToolbar.setTitleTextAppearance(this, R.style.ToolbarTextAppearance);
         setSupportActionBar(mToolbar); // Set mToolbar as Action Bar
 
+        // ViewPager config
+        mViewPager.setAdapter(mCardAdapter);
+        mViewPager.setPageTransformer(false, mCardShadowTransformer);
+        mViewPager.setOffscreenPageLimit(3);
+
         // If change in plant database is detected, check if there was a new plant created by current user
         mDatabaseReference.child("plants").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
+               for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
                     Plant plant = plantSnapshot.getValue(Plant.class);
 
                     // Check if plant card is already in list
                     boolean alreadyInList = false;
-                    final int childCount = mLinearLayout.getChildCount();
+                    final int childCount = mViewPager.getChildCount();
                     for (int i = 0; i < childCount; i++) {
-                        View view = mLinearLayout.getChildAt(i);
-                        if (plantSnapshot.getKey() == view.getTag()) {
+                        View view = mViewPager.getChildAt(i);
+
+                        if (plantSnapshot.getKey().equals(view.getTag())) {
                             alreadyInList = true;
                         }
                     }
 
                     if (plant.uid.equals(currentUser.getUid()) && !alreadyInList) {
                         // Initialize a new CardView
-                        CardView plantCard = new CardView(new ContextThemeWrapper(JournalActivity.this, R.style.PlantCardViewAppearance), null, 0);
-                        // Set tag to check if already in list
-                        plantCard.setTag(plantSnapshot.getKey());
-                        LinearLayout plantCardInner = new LinearLayout(new ContextThemeWrapper(JournalActivity.this, R.style.PlantInnerCardViewAppearance));
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT
-                        );
-                        int margin = 8;
-                        params.setMargins(margin, margin, margin, margin);
-                        plantCard.setLayoutParams(params);
-
-                        // Initialize a new TextView and put in CardView
-                        TextView plantNameView = new TextView(mContext);
-                        plantNameView.setText(plant.plantName);
-                        TextViewCompat.setTextAppearance(plantNameView, R.style.PlantNameTextViewAppearance);
-                        plantCardInner.addView(plantNameView);
-
-                        // Initialize a new TextView and put in CardView
-                        if (plant.plantSpecies.length() > 0) {
-                            TextView plantSpeciesView = new TextView(mContext);
-                            plantSpeciesView.setText(plant.plantSpecies);
-                            TextViewCompat.setTextAppearance(plantSpeciesView, R.style.PlantSpeciesTextViewAppearance);
-                            plantCardInner.addView(plantSpeciesView);
-                        }
-
-                        // Initialize a new TextView and put in CardView
-                        if (plant.plantSpecies.length() > 0) {
-                            // Initialize a new TextView and put in CardView
-                            TextView plantBirthdayView = new TextView(mContext);
-                            plantBirthdayView.setText(String.format(getString(R.string.plant_card_birthday), plant.plantBirthday));
-                            TextViewCompat.setTextAppearance(plantBirthdayView, R.style.PlantBirthdayTextViewAppearance);
-                            plantCardInner.addView(plantBirthdayView);
-                        }
-
-                        plantCard.addView(plantCardInner);
-                        // Finally, add the CardView in root layout
-                        mLinearLayout.addView(plantCard);
-
+                        mCardAdapter.addCardItem(new Plant(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid()));
+                        mCardAdapter.notifyDataSetChanged();
                         // If plantCard clicked
-                        plantCard.setOnClickListener(new View.OnClickListener() {
+                     /*   plantCard.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 // Send key as intent
@@ -136,7 +101,7 @@ public class JournalActivity extends AppCompatActivity {
                                 intent.putExtra("capturedPhotoPath", plantSnapshot.getKey());
                                 startActivity(intent);
                             }
-                        });
+                        });*/
                     }
                 }
             }
@@ -157,4 +122,7 @@ public class JournalActivity extends AppCompatActivity {
         createPlantDialogFragment.show(fm, "fragment_create_plant");
     }
 
+    public static float dpToPixels(int dp, Context context) {
+        return dp * (context.getResources().getDisplayMetrics().density);
+    }
 }

@@ -14,4 +14,20 @@ public class Plant {
         plantBirthday = providedPlantBirthday;
         uid = providedUid;
     }
+
+    public String getPlantName() {
+        return plantName;
+    }
+
+    public String getPlantSpecies() {
+        return plantSpecies;
+    }
+
+    public String getPlantBirthday() {
+        return plantBirthday;
+    }
+
+    public String getPlantUid() {
+        return uid;
+    }
 }
