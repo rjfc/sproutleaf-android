@@ -39,9 +39,6 @@ public class CreatePlantDialogFragment extends DialogFragment {
     private Button mProfileSubmit;
     private Context mContext;
 
-    public void CreatePlantDialogFragment() {
-    }
-
     // Function for giving a name to the dialog fragment
     public static CreatePlantDialogFragment newInstance(String title) {
         CreatePlantDialogFragment frag = new CreatePlantDialogFragment();
@@ -84,7 +81,6 @@ public class CreatePlantDialogFragment extends DialogFragment {
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if (databaseError == null) {
                         String uniqueKey = databaseReference.getKey();
-                        Log.d("PLANTS", uniqueKey);
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
                         getDialog().dismiss();
                     }

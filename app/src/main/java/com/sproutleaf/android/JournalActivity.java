@@ -15,6 +15,7 @@ import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,13 +24,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class JournalActivity extends AppCompatActivity {
+public class JournalActivity extends AppCompatActivity{
     private static final String TAG = JournalActivity.class.getName();
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
-    private Context mContext;
     private androidx.appcompat.widget.Toolbar mToolbar;
     private ViewPager mViewPager;
+    private Context mContext;
 
     private CardPagerAdapter mCardAdapter;
     private ShadowTransformer mCardShadowTransformer;
@@ -69,6 +70,10 @@ public class JournalActivity extends AppCompatActivity {
         mViewPager.setPageTransformer(false, mCardShadowTransformer);
         mViewPager.setOffscreenPageLimit(3);
 
+        // TabLayout config
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
+        tabLayout.setupWithViewPager(mViewPager, true);
+
         // If change in plant database is detected, check if there was a new plant created by current user
         mDatabaseReference.child("plants").addValueEventListener(new ValueEventListener() {
             @Override
@@ -76,21 +81,20 @@ public class JournalActivity extends AppCompatActivity {
                for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
                     Plant plant = plantSnapshot.getValue(Plant.class);
-
                     // Check if plant card is already in list
                     boolean alreadyInList = false;
+
                     final int childCount = mViewPager.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         View view = mViewPager.getChildAt(i);
-
                         if (plantSnapshot.getKey().equals(view.getTag())) {
                             alreadyInList = true;
                         }
                     }
 
-                    if (plant.uid.equals(currentUser.getUid()) && !alreadyInList) {
-                        // Initialize a new CardView
-                        mCardAdapter.addCardItem(new Plant(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid()));
+                    if (plant.getUserID().equals(currentUser.getUid()) && !alreadyInList) {
+                        // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
+                        mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), plantSnapshot.getKey()));
                         mCardAdapter.notifyDataSetChanged();
                         // If plantCard clicked
                      /*   plantCard.setOnClickListener(new View.OnClickListener() {

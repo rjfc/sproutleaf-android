@@ -1,18 +1,20 @@
 package com.sproutleaf.android;
 
-public class Plant {
+public class PlantCardItem {
     public String plantName;
     public String plantSpecies;
     public String plantBirthday;
     public String userID;
+    public String plantID;
 
-    public Plant() {}
+    public PlantCardItem() {}
 
-    public Plant(String providedPlantName, String providedPlantSpecies, String providedPlantBirthday, String providedUserID) {
+    public PlantCardItem(String providedPlantName, String providedPlantSpecies, String providedPlantBirthday, String providedUserID, String providedPlantID) {
         plantName = providedPlantName;
         plantSpecies = providedPlantSpecies;
         plantBirthday = providedPlantBirthday;
         userID = providedUserID;
+        plantID = providedPlantID;
     }
 
     public String getPlantName() {
@@ -29,5 +31,9 @@ public class Plant {
 
     public String getUserID() {
         return userID;
+    }
+
+    public String getPlantID() {
+        return plantID;
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
 
     private List<CardView> mViews;
-    private List<Plant> mData;
+    private List<PlantCardItem> mData;
     private float mBaseElevation;
 
     public CardPagerAdapter() {
@@ -22,7 +22,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         mViews = new ArrayList<>();
     }
 
-    public void addCardItem(Plant plant) {
+    public void addCardItem(PlantCardItem plant) {
         mViews.add(null);
         mData.add(plant);
     }
@@ -69,7 +69,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         mViews.set(position, null);
     }
 
-    private void bind(Plant plant, View view) {
+    private void bind(PlantCardItem plant, View view) {
         TextView plantNameTextView = (TextView) view.findViewById(R.id.plant_name);
         TextView plantSpeciesTextView = (TextView) view.findViewById(R.id.plant_species);
         TextView plantBirthdayTextView = (TextView) view.findViewById(R.id.plant_birthday);
@@ -77,6 +77,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         plantNameTextView.setText(plant.getPlantName());
         plantSpeciesTextView.setText(plant.getPlantSpecies());
         plantBirthdayTextView.setText(plant.getPlantBirthday());
+        view.setTag(plant.getPlantID());
     }
 
 }
