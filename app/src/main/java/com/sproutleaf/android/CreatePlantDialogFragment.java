@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -75,19 +76,21 @@ public class CreatePlantDialogFragment extends DialogFragment {
             if (!validateForm()) {
                 return;
             }
-            FirebaseUser currentUser = mAuth.getCurrentUser();
+            final FirebaseUser currentUser = mAuth.getCurrentUser();
             DatabaseReference plantsReference = mDatabaseReference.child("plants");
             Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
-            plantsReference.push().setValue(newPlant).addOnSuccessListener(new OnSuccessListener<Void>() {
+            plantsReference.push().setValue(newPlant, new DatabaseReference.CompletionListener() {
                 @Override
-                public void onSuccess(Void aVoid) {
-                    getDialog().dismiss();
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    e.printStackTrace();
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        String uniqueKey = databaseReference.getKey();
+                        Log.d("PLANTS", uniqueKey);
+                        mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
+                        getDialog().dismiss();
+                    }
+                    else {
+                        Log.e(TAG, databaseError.toString());
+                    }
                 }
             });
             }

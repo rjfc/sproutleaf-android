@@ -27,7 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class AuthenticationActivity extends AppCompatActivity {
     private static final String TAG = AuthenticationActivity.class.getName();
     private FirebaseAuth mAuth;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabaseReference;
     private EditText mEmailField;
     private EditText mPasswordField;
     private TextView mStatusTextView;
@@ -40,7 +40,7 @@ public class AuthenticationActivity extends AppCompatActivity {
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Set member variables
         mEmailField = findViewById(R.id.auth_email);
@@ -110,7 +110,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                     FirebaseUser currentUser = mAuth.getCurrentUser();
 
                     // Update in database
-                    mDatabase.child("users").child(currentUser.getUid()).setValue(currentUser);
+                    mDatabaseReference.child("users").child(currentUser.getUid()).setValue(currentUser);
 
                     updateUI(currentUser);
                 } else {

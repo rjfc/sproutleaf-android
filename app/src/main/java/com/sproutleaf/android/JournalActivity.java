@@ -121,8 +121,4 @@ public class JournalActivity extends AppCompatActivity {
         CreatePlantDialogFragment createPlantDialogFragment = CreatePlantDialogFragment.newInstance("New Plant Profile");
         createPlantDialogFragment.show(fm, "fragment_create_plant");
     }
-
-    public static float dpToPixels(int dp, Context context) {
-        return dp * (context.getResources().getDisplayMetrics().density);
-    }
 }

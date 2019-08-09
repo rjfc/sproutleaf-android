@@ -27,7 +27,7 @@ public class Plant {
         return plantBirthday;
     }
 
-    public String getPlantUid() {
+    public String getUid() {
         return uid;
     }
 }
