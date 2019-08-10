@@ -1,5 +1,6 @@
 package com.sproutleaf.android;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +79,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         plantSpeciesTextView.setText(plant.getPlantSpecies());
         plantBirthdayTextView.setText(plant.getPlantBirthday());
         view.setTag(plant.getPlantID());
+        Log.d("plants", "tag set:" + view.getTag());
     }
 
 }

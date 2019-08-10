@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-public class PredictingSpinnerFragment extends DialogFragment {
-    public void PredictingSpinnerFragment() {
+public class CreatingPlantProfileSpinnerFragment extends DialogFragment {
+    public void CreatingPlantProfileSpinnerFragment() {
     }
 
     // Function for giving a name to the dialog fragment
-    public static PredictingSpinnerFragment newInstance(String title) {
-        PredictingSpinnerFragment frag = new PredictingSpinnerFragment();
+    public static CreatingPlantProfileSpinnerFragment newInstance(String title) {
+        CreatingPlantProfileSpinnerFragment frag = new CreatingPlantProfileSpinnerFragment();
         Bundle args = new Bundle();
         args.putString("title", title);
         frag.setArguments(args);
@@ -23,8 +23,9 @@ public class PredictingSpinnerFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setCancelable(false); // Do not cancel dialog when outside is touched
-        View rootView = inflater.inflate(R.layout.fragment_predicting_spinner, container);
+        setCancelable(false);
+        this.getDialog().setCanceledOnTouchOutside(false); // Do not cancel dialog when outside is touched
+        View rootView = inflater.inflate(R.layout.fragment_creating_plant_profile_spinner, container);
         return rootView;
     }
 

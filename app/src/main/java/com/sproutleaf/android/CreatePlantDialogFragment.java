@@ -1,10 +1,24 @@
 package com.sproutleaf.android;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import androidx.fragment.app.FragmentManager;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +26,15 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -24,19 +43,38 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 
 public class CreatePlantDialogFragment extends DialogFragment {
     private static final String TAG = CreatePlantDialogFragment.class.getName();
+    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQUEST_CROP_IMAGE = 2;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
+    private FirebaseStorage mStorage;
+    private StorageReference mStorageReference;
+    private StorageReference mStoragePlantProfileImagesReference;
+    private StorageReference mStorageUploadedPlantProfileImageReference;
     private EditText mPlantNameField;
     private EditText mPlantSpeciesField;
     private EditText mPlantBirthdayField;
+    private ImageView mPlantTakeImageButton;
+    private ImageView mPlantTakeImageThumbnail;
+    private String mCurrentImagePath;
     private Button mProfileSubmit;
+    private Bitmap mCurrentImageBitmap;
+    private CreatingPlantProfileSpinnerFragment mCreatingPlantProfileDialog;
     private Context mContext;
 
     // Function for giving a name to the dialog fragment
@@ -55,15 +93,21 @@ public class CreatePlantDialogFragment extends DialogFragment {
         mPlantSpeciesField = rootView.findViewById(R.id.give_plant_species_field);
         mPlantBirthdayField = rootView.findViewById(R.id.give_plant_birthday_field);
         mProfileSubmit = rootView.findViewById(R.id.plant_profile_submit);
+        mPlantTakeImageButton = rootView.findViewById(R.id.take_plant_image_button);
+        mPlantTakeImageThumbnail = rootView.findViewById(R.id.take_plant_image_thumbnail);
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance();
+        mStorageReference = mStorage.getReference();
+        mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
 
         // If submit button clicked
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            showCreatingPlantProfileDialog();
             // Update plant in database
             String plantName = mPlantNameField.getText().toString();
             String plantSpecies = mPlantSpeciesField.getText().toString();
@@ -81,8 +125,33 @@ public class CreatePlantDialogFragment extends DialogFragment {
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if (databaseError == null) {
                         String uniqueKey = databaseReference.getKey();
+                        // Upload image to Firebase Storage
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
-                        getDialog().dismiss();
+                        mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(uniqueKey + ".jpg");
+                        if (mCurrentImageBitmap != null) {
+                            Bitmap uploadBitmap = mCurrentImageBitmap;
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+                            byte[] data = baos.toByteArray();
+
+                            UploadTask uploadTask = mStorageUploadedPlantProfileImageReference.putBytes(data);
+                            uploadTask.addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Handle unsuccessful uploads
+                                }
+                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    hideCreatingPlantProfileDialog();
+                                    getDialog().dismiss();
+                                }
+                            });
+                        }
+                        else {
+                            hideCreatingPlantProfileDialog();
+                            getDialog().dismiss();
+                        }
                     }
                     else {
                         Log.e(TAG, databaseError.toString());
@@ -115,7 +184,71 @@ public class CreatePlantDialogFragment extends DialogFragment {
             }
         });
 
+        // If take plant image button clicked launch camera activity
+        mPlantTakeImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // Ensure that there's a camera activity to handle the intent
+                if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                        // TODO: error handling
+                    }
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(getContext(),
+                                "com.sproutleaf.android.fileprovider",
+                                photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                }
+            }
+        });
+
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_TAKE_PHOTO) {
+                try {
+                    // Only resize when image added
+                    int heightInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 126, getResources().getDisplayMetrics());
+                    int widthInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, getResources().getDisplayMetrics());
+                    mPlantTakeImageThumbnail.getLayoutParams().height = heightInDp;
+                    mPlantTakeImageThumbnail.getLayoutParams().width = widthInDp;
+                    mPlantTakeImageThumbnail.requestLayout();
+
+                    mCurrentImageBitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContext().getContentResolver(), Uri.fromFile(new File(mCurrentImagePath))));
+                    mPlantTakeImageThumbnail.setImageBitmap(mCurrentImageBitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    // Create image file of captured plant
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentImagePath = image.getAbsolutePath();
+        return image;
     }
 
     @Override
@@ -127,6 +260,18 @@ public class CreatePlantDialogFragment extends DialogFragment {
         // Show soft keyboard automatically and request focus to field
         mPlantNameField.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    }
+
+    // Create dialog instance
+    private void showCreatingPlantProfileDialog() {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        mCreatingPlantProfileDialog = CreatingPlantProfileSpinnerFragment.newInstance("Creating Plant Profile...");
+        mCreatingPlantProfileDialog.show(fm, "fragment_creating_plant_profile_spinner");
+    }
+
+    // Hide dialog
+    private void hideCreatingPlantProfileDialog() {
+        mCreatingPlantProfileDialog.dismissDialog();
     }
 
     private boolean validateForm() {

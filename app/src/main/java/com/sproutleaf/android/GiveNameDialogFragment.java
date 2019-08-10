@@ -27,7 +27,7 @@ public class GiveNameDialogFragment extends DialogFragment {
     private EditText mEditEmail;
     private Button mAuthSubmit;
 
-    public void EditNameDialogFragment() {
+    public void GiveNameDialogFragment() {
     }
 
     // Function for giving a name to the dialog fragment

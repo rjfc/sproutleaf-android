@@ -68,7 +68,7 @@ public class JournalActivity extends AppCompatActivity{
         // ViewPager config
         mViewPager.setAdapter(mCardAdapter);
         mViewPager.setPageTransformer(false, mCardShadowTransformer);
-        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setOffscreenPageLimit(100); // TODO: set limit on how many plants a user can make
 
         // TabLayout config
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
@@ -78,20 +78,21 @@ public class JournalActivity extends AppCompatActivity{
         mDatabaseReference.child("plants").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
                     Plant plant = plantSnapshot.getValue(Plant.class);
                     // Check if plant card is already in list
                     boolean alreadyInList = false;
-
                     final int childCount = mViewPager.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         View view = mViewPager.getChildAt(i);
-                        if (plantSnapshot.getKey().equals(view.getTag())) {
+                        Log.d("plant", "tag:" + (String)view.getTag());
+                        if (plantSnapshot.getKey().equals((String)view.getTag())) {
                             alreadyInList = true;
+                            break;
                         }
                     }
-
                     if (plant.getUserID().equals(currentUser.getUid()) && !alreadyInList) {
                         // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
                         mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), plantSnapshot.getKey()));

@@ -8,27 +8,6 @@
     android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
-    <Button
-        android:id="@+id/plant_profile_submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/rounded_button_green_dark_green_stroke"
-        android:fontFamily="@font/lato"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        android:paddingLeft="17dp"
-        android:paddingTop="12dp"
-        android:paddingRight="17dp"
-        android:paddingBottom="12dp"
-        android:text="@string/fragment_give_name_button_text"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/give_plant_birthday_field" />
-
     <ImageView
         android:id="@+id/plant_profile_sproutleaf_image"
         android:layout_width="67dp"
@@ -135,5 +114,62 @@
         android:onClick="openDatePicker"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/give_plant_birthday_prompt" />
+
+    <TextView
+        android:id="@+id/take_plant_image_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/take_plant_image_prompt_text"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/give_plant_birthday_field" />
+
+    <ImageView
+        android:id="@+id/take_plant_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginEnd="88dp"
+        android:background="@drawable/rounded_button_green_dark_green_stroke"
+        android:gravity="center"
+        android:padding="5dp"
+        android:src="@drawable/ic_camera_alt_black_24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/take_plant_image_prompt"
+        app:layout_constraintTop_toBottomOf="@+id/give_plant_birthday_field" />
+
+    <ImageView
+        android:id="@+id/take_plant_image_thumbnail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="5dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@+id/plant_profile_submit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/take_plant_image_prompt" />
+
+    <Button
+        android:id="@+id/plant_profile_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/rounded_button_green_dark_green_stroke"
+        android:fontFamily="@font/lato"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:paddingLeft="17dp"
+        android:paddingTop="12dp"
+        android:paddingRight="17dp"
+        android:paddingBottom="12dp"
+        android:text="@string/fragment_give_name_button_text"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

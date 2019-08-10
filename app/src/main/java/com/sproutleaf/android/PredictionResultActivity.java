@@ -58,7 +58,7 @@ public class PredictionResultActivity extends AppCompatActivity {
         mPredictionInfo = findViewById(R.id.prediction_info);
         super.onStart();
 
-        showPredictionDialog();
+        showPredictingDialog();
 
         try{
             // Get path intent and set image view to image
@@ -195,18 +195,18 @@ public class PredictionResultActivity extends AppCompatActivity {
             mPredictionInfo.setText(getString(R.string.prediction_info_text_urgent));
             mPredictionInfo.setTextColor(getResources().getColor(R.color.urgentRed, null));
         }
-        hidePredictionDialog();
+        hidePredictingDialog();
     }
 
     // Create dialog instance
-    private void showPredictionDialog() {
+    private void showPredictingDialog() {
         FragmentManager fm = getSupportFragmentManager();
         mPredictingDialog = PredictingSpinnerFragment.newInstance("Predicting...");
         mPredictingDialog.show(fm, "fragment_predicting_spinner");
     }
 
     // Hide dialog
-    private void hidePredictionDialog() {
+    private void hidePredictingDialog() {
         mPredictingDialog.dismissDialog();
     }
 }

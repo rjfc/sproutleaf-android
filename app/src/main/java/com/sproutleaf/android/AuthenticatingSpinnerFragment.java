@@ -23,7 +23,7 @@ public class AuthenticatingSpinnerFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        this.getDialog().setCanceledOnTouchOutside(false); // Do not cancel dialog when outside is touched
+        setCancelable(false); // Do not cancel dialog when outside is touched
         View rootView = inflater.inflate(R.layout.fragment_authenticating_spinner, container);
         return rootView;
     }
