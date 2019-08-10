@@ -54,17 +54,17 @@
             android:text="Born on date"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/plant_image" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/plant_image"
             android:layout_width="160dp"
             android:layout_height="231dp"
             android:layout_gravity="bottom|center"
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="8dp"
-            android:scaleType="centerInside"
+            android:scaleType="centerCrop"
             android:src="@drawable/sproutleaf_logo_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

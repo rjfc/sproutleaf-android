@@ -47,5 +47,6 @@
         <string name="no_storage_card">No storage card</string>
         <string name="not_enough_space">Not enough space</string>
     <string name="creating_plant_profile_spinner_text">Creating plant profile...</string>
+    <string name="loading_plant_profiles_spinner_text">Loading plants...</string>
 
 </resources>

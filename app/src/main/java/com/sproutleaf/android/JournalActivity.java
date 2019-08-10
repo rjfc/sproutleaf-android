@@ -32,6 +32,7 @@ public class JournalActivity extends AppCompatActivity{
     private ViewPager mViewPager;
     private Context mContext;
 
+    private LoadingPlantProfilesSpinnerFragment mLoadingPlantProfilesDialog;
     private CardPagerAdapter mCardAdapter;
     private ShadowTransformer mCardShadowTransformer;
 
@@ -57,7 +58,7 @@ public class JournalActivity extends AppCompatActivity{
         super.onStart();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         String displayName = currentUser.getDisplayName();
-
+        showLoadingPlantProfilesDialog();
         // Toolbar config
         mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.darkerGrey, null));
         mToolbar.setTitleTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null));
@@ -87,7 +88,6 @@ public class JournalActivity extends AppCompatActivity{
                     final int childCount = mViewPager.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         View view = mViewPager.getChildAt(i);
-                        Log.d("plant", "tag:" + (String)view.getTag());
                         if (plantSnapshot.getKey().equals((String)view.getTag())) {
                             alreadyInList = true;
                             break;
@@ -108,6 +108,7 @@ public class JournalActivity extends AppCompatActivity{
                             }
                         });*/
                     }
+                    hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
                 }
             }
 
@@ -118,6 +119,18 @@ public class JournalActivity extends AppCompatActivity{
         });
 
 
+    }
+
+    // Create dialog instance
+    private void showLoadingPlantProfilesDialog() {
+        FragmentManager fm = this.getSupportFragmentManager();
+        mLoadingPlantProfilesDialog = LoadingPlantProfilesSpinnerFragment.newInstance("Loeading plant profiles...");
+        mLoadingPlantProfilesDialog.show(fm, "fragment_creating_plant_profile_spinner");
+    }
+
+    // Hide dialog
+    private void hideLoadingPlantProfilesDialog() {
+        mLoadingPlantProfilesDialog.dismissDialog();
     }
 
     // Create a new plant

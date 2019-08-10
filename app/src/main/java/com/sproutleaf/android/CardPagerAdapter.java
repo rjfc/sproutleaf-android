@@ -1,13 +1,23 @@
 package com.sproutleaf.android;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.viewpager.widget.PagerAdapter;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +27,12 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private List<CardView> mViews;
     private List<PlantCardItem> mData;
     private float mBaseElevation;
+
+    private FirebaseAuth mAuth;
+    private FirebaseStorage mStorage;
+    private StorageReference mStorageReference;
+    private StorageReference mStoragePlantProfileImagesReference;
+    private StorageReference mStorageUploadedPlantProfileImageReference;
 
     public CardPagerAdapter() {
         mData = new ArrayList<>();
@@ -49,6 +65,11 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        mAuth = FirebaseAuth.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+        mStorageReference = mStorage.getReference();
+        mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
+
         View view = LayoutInflater.from(container.getContext())
                 .inflate(R.layout.adapter, container, false);
         container.addView(view);
@@ -79,7 +100,23 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         plantSpeciesTextView.setText(plant.getPlantSpecies());
         plantBirthdayTextView.setText(plant.getPlantBirthday());
         view.setTag(plant.getPlantID());
-        Log.d("plants", "tag set:" + view.getTag());
-    }
 
+        mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg");
+
+        final ImageView plantImageView = (ImageView) view.findViewById(R.id.plant_image);
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        mStorageUploadedPlantProfileImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                plantImageView.setImageBitmap(bitmap);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });
+    }
 }

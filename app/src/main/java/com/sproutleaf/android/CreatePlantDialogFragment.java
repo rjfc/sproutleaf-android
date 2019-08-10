@@ -59,7 +59,6 @@ import java.text.SimpleDateFormat;
 public class CreatePlantDialogFragment extends DialogFragment {
     private static final String TAG = CreatePlantDialogFragment.class.getName();
     static final int REQUEST_TAKE_PHOTO = 1;
-    static final int REQUEST_CROP_IMAGE = 2;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
     private FirebaseStorage mStorage;
@@ -131,7 +130,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
                         if (mCurrentImageBitmap != null) {
                             Bitmap uploadBitmap = mCurrentImageBitmap;
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+                            uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 10, baos);
                             byte[] data = baos.toByteArray();
 
                             UploadTask uploadTask = mStorageUploadedPlantProfileImageReference.putBytes(data);
@@ -265,7 +264,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
     // Create dialog instance
     private void showCreatingPlantProfileDialog() {
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        mCreatingPlantProfileDialog = CreatingPlantProfileSpinnerFragment.newInstance("Creating Plant Profile...");
+        mCreatingPlantProfileDialog = CreatingPlantProfileSpinnerFragment.newInstance("Creating plant profile...");
         mCreatingPlantProfileDialog.show(fm, "fragment_creating_plant_profile_spinner");
     }
 
