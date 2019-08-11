@@ -2,15 +2,22 @@ package com.sproutleaf.android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,14 +26,21 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class JournalActivity extends AppCompatActivity{
     private static final String TAG = JournalActivity.class.getName();
+    private boolean alreadyInList = false;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
     private androidx.appcompat.widget.Toolbar mToolbar;
     private ViewPager mViewPager;
+    private FirebaseStorage mStorage;
+    private StorageReference mStorageReference;
+    private StorageReference mStoragePlantProfileImagesReference;
     private Context mContext;
+
 
     private LoadingPlantProfilesSpinnerFragment mLoadingPlantProfilesDialog;
     private CardPagerAdapter mCardAdapter;
@@ -40,6 +54,9 @@ public class JournalActivity extends AppCompatActivity{
         // Initialize Firebase variables
         mAuth = FirebaseAuth.getInstance();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance();
+        mStorageReference = mStorage.getReference();
+        mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
 
         // Set member variables
         mContext = getApplicationContext();
@@ -77,9 +94,8 @@ public class JournalActivity extends AppCompatActivity{
                 //showLoadingPlantProfilesDialog();
                 for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
-                    Plant plant = plantSnapshot.getValue(Plant.class);
+                    final Plant plant = plantSnapshot.getValue(Plant.class);
                     // Check if plant card is already in list
-                    boolean alreadyInList = false;
                     final int childCount = mViewPager.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         View view = mViewPager.getChildAt(i);
@@ -88,11 +104,15 @@ public class JournalActivity extends AppCompatActivity{
                             break;
                         }
                     }
-                    if (plant.getUserID().equals(currentUser.getUid()) && !alreadyInList) {
-                        // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
-                        mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), plantSnapshot.getKey()));
-                        mCardAdapter.notifyDataSetChanged();
-                        // If plantCard clicked
+
+                    mStoragePlantProfileImagesReference.child(plantSnapshot.getKey() + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            if (plant.getUserID().equals(currentUser.getUid()) && !alreadyInList) {
+                                // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
+                                mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), plantSnapshot.getKey()));
+                                mCardAdapter.notifyDataSetChanged();
+                                // If plantCard clicked
                      /*   plantCard.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -102,7 +122,16 @@ public class JournalActivity extends AppCompatActivity{
                                 startActivity(intent);
                             }
                         });*/
-                    }
+                            }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "Plant image does not exist.");
+                        }
+                    });
+
                 }
                // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
             }

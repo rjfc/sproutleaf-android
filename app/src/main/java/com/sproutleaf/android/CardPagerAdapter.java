@@ -2,6 +2,7 @@ package com.sproutleaf.android;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
+    private static final String TAG = CardPagerAdapter.class.getName();
 
     private List<CardView> mViews;
     private List<PlantCardItem> mData;
@@ -91,7 +94,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         mViews.set(position, null);
     }
 
-    private void bind(PlantCardItem plant, View view) {
+    private void bind(final PlantCardItem plant, final View view) {
         TextView plantNameTextView = (TextView) view.findViewById(R.id.plant_name);
         TextView plantSpeciesTextView = (TextView) view.findViewById(R.id.plant_species);
         TextView plantBirthdayTextView = (TextView) view.findViewById(R.id.plant_birthday);
@@ -101,21 +104,30 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         plantBirthdayTextView.setText(plant.getPlantBirthday());
         view.setTag(plant.getPlantID());
 
-        mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg");
-
-        final ImageView plantImageView = (ImageView) view.findViewById(R.id.plant_image);
-
-        final long ONE_MEGABYTE = 1024 * 1024;
-        mStorageUploadedPlantProfileImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+        mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onSuccess(byte[] bytes) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                plantImageView.setImageBitmap(bitmap);
+            public void onSuccess(Uri uri) {
+                mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg");
+                final ImageView plantImageView = (ImageView) view.findViewById(R.id.plant_image);
+
+                final long ONE_MEGABYTE = 1024 * 1024;
+                mStorageUploadedPlantProfileImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        plantImageView.setImageBitmap(bitmap);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
+            public void onFailure(@NonNull Exception e) {
+                e.printStackTrace();
+                Log.d(TAG, "Plant image does not exist.");
             }
         });
     }

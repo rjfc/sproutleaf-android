@@ -40,13 +40,7 @@
     <string name="give_plant_birthday_hint_text">e.g. 6/12/2018</string>
     <string name="plant_card_birthday">Born on %1$s</string>
     <string name="take_plant_image_prompt_text">Take a picture of your plant!</string>
-        <string name="cancel">Cancel</string>
-        <string name="save">Save</string>
-        <string name="saving_image">Saving image</string>
-        <string name="preparing_card">Preparing card</string>
-        <string name="no_storage_card">No storage card</string>
-        <string name="not_enough_space">Not enough space</string>
-    <string name="creating_plant_profile_spinner_text">Creating plant profile...</string>
-    <string name="loading_plant_profiles_spinner_text">Loading plants...</string>
+    <string name="creating_plant_profile_spinner_text">Creating plant profile…</string>
+    <string name="loading_plant_profiles_spinner_text">Loading plants…</string>
 
 </resources>

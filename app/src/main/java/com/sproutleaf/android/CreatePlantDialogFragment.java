@@ -123,7 +123,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     if (databaseError == null) {
-                        String uniqueKey = databaseReference.getKey();
+                        final String uniqueKey = databaseReference.getKey();
                         // Upload image to Firebase Storage
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
                         mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(uniqueKey + ".jpg");
@@ -142,6 +142,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
                             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    mDatabaseReference.child("plants").child(uniqueKey).child("profileImageUrl").setValue(mStorageUploadedPlantProfileImageReference.getPath());
                                     hideCreatingPlantProfileDialog();
                                     getDialog().dismiss();
                                 }
