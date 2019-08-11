@@ -5,13 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
@@ -58,7 +54,6 @@ public class JournalActivity extends AppCompatActivity{
         super.onStart();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         String displayName = currentUser.getDisplayName();
-        showLoadingPlantProfilesDialog();
         // Toolbar config
         mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.darkerGrey, null));
         mToolbar.setTitleTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null));
@@ -79,8 +74,8 @@ public class JournalActivity extends AppCompatActivity{
         mDatabaseReference.child("plants").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-               for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
+                //showLoadingPlantProfilesDialog();
+                for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
                     Plant plant = plantSnapshot.getValue(Plant.class);
                     // Check if plant card is already in list
@@ -108,8 +103,8 @@ public class JournalActivity extends AppCompatActivity{
                             }
                         });*/
                     }
-                    hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
                 }
+               // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
             }
 
             @Override
@@ -117,8 +112,6 @@ public class JournalActivity extends AppCompatActivity{
                 Log.w(TAG, "onCancelled", databaseError.toException());
             }
         });
-
-
     }
 
     // Create dialog instance

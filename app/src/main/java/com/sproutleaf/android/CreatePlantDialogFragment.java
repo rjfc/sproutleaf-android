@@ -128,9 +128,9 @@ public class CreatePlantDialogFragment extends DialogFragment {
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
                         mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(uniqueKey + ".jpg");
                         if (mCurrentImageBitmap != null) {
-                            Bitmap uploadBitmap = mCurrentImageBitmap;
+                            Bitmap uploadBitmap = resize(mCurrentImageBitmap, 600, 800);
                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+                            uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
                             byte[] data = baos.toByteArray();
 
                             UploadTask uploadTask = mStorageUploadedPlantProfileImageReference.putBytes(data);
@@ -248,6 +248,27 @@ public class CreatePlantDialogFragment extends DialogFragment {
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentImagePath = image.getAbsolutePath();
         return image;
+    }
+
+    private static Bitmap resize(Bitmap image, int maxWidth, int maxHeight) {
+        if (maxHeight > 0 && maxWidth > 0) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            float ratioBitmap = (float) width / (float) height;
+            float ratioMax = (float) maxWidth / (float) maxHeight;
+
+            int finalWidth = maxWidth;
+            int finalHeight = maxHeight;
+            if (ratioMax > 1) {
+                finalWidth = (int) ((float)maxHeight * ratioBitmap);
+            } else {
+                finalHeight = (int) ((float)maxWidth / ratioBitmap);
+            }
+            image = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
+            return image;
+        } else {
+            return image;
+        }
     }
 
     @Override
