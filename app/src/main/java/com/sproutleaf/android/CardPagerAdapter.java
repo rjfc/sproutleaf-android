@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +28,7 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private static final String TAG = CardPagerAdapter.class.getName();
 
@@ -40,6 +42,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
     private StorageReference mStorageUploadedPlantProfileImageReference;
+    private int mIndex;
 
     public CardPagerAdapter() {
         mData = new ArrayList<>();
@@ -77,6 +80,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         mStorage = FirebaseStorage.getInstance();
         mStorageReference = mStorage.getReference();
         mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
+        mIndex = 0;
 
         View view = LayoutInflater.from(container.getContext())
                 .inflate(R.layout.adapter, container, false);
@@ -95,9 +99,8 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((View) object);
-        mViews.set(position, null);
-        container.setSaveFromParentEnabled(false);
+       // container.removeView((View) object);
+        mViews.remove(position);
         notifyDataSetChanged();
     }
 
@@ -133,12 +136,14 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         // If delete plant button is clicked
         deletePlantProfileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 mStorageUploadedPlantProfileImageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(plant.getPlantID()).removeValue();
                         mDatabaseReference.child("plants").child(plant.getPlantID()).removeValue();
+                        JournalActivity ja = new JournalActivity();
+                        ja.removePlantView(plant.getPlantID()); // Temporary way to access method
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

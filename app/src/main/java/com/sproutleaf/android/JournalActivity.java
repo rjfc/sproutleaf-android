@@ -38,7 +38,8 @@ public class JournalActivity extends AppCompatActivity{
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
     private androidx.appcompat.widget.Toolbar mToolbar;
-    private ViewPager mViewPager;
+    private ImageView mDeletePlantProfileImageView;
+    private static ViewPager mViewPager;
     private FirebaseStorage mStorage;
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
@@ -48,7 +49,7 @@ public class JournalActivity extends AppCompatActivity{
 
 
     private LoadingPlantProfilesSpinnerFragment mLoadingPlantProfilesDialog;
-    private CardPagerAdapter mCardAdapter;
+    private static CardPagerAdapter mCardAdapter;
     private ShadowTransformer mCardShadowTransformer;
 
     @Override
@@ -69,6 +70,7 @@ public class JournalActivity extends AppCompatActivity{
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mCardAdapter = new CardPagerAdapter();
         mCardShadowTransformer = new ShadowTransformer(mViewPager, mCardAdapter);
+        mDeletePlantProfileImageView = findViewById(R.id.delete_plant_profile_button);
     }
 
     @Override
@@ -99,7 +101,7 @@ public class JournalActivity extends AppCompatActivity{
                 //showLoadingPlantProfilesDialog();
                 for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
-                    final Plant plant = plantSnapshot.getValue(Plant.class);
+                    Plant plant = plantSnapshot.getValue(Plant.class);
                     if (plant.getUserID().equals(currentUser.getUid())) {
                         // Check if plant card is already in list
                         final int childCount = mViewPager.getChildCount();
@@ -116,7 +118,7 @@ public class JournalActivity extends AppCompatActivity{
                             // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
                             mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), plantSnapshot.getKey()));
                             mCardAdapter.notifyDataSetChanged();
-
+                            plant = null;
                         }
                     }
                 }
@@ -130,7 +132,7 @@ public class JournalActivity extends AppCompatActivity{
         });
 
         // If change in plant database is detected, check if there was a new plant created by current user
-         plantChildEventListener = mDatabaseReference.child("plants").addChildEventListener (new ChildEventListener() {
+        plantChildEventListener = mDatabaseReference.child("plants").addChildEventListener (new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
 
@@ -145,7 +147,6 @@ public class JournalActivity extends AppCompatActivity{
                     alreadyInList = false;
                     Log.d("plant", Boolean.toString(alreadyInList));
                     for (int i = 0; i < childCount; i++) {
-                        final int index = i;
                         final View view = mViewPager.getChildAt(i);
                         Log.d("plants", dataSnapshot.getKey() + " | " + (String) view.getTag());
                         if (dataSnapshot.getKey().equals((String) view.getTag())) {
@@ -190,7 +191,7 @@ public class JournalActivity extends AppCompatActivity{
     // Create dialog instance
     private void showLoadingPlantProfilesDialog() {
         FragmentManager fm = this.getSupportFragmentManager();
-        mLoadingPlantProfilesDialog = LoadingPlantProfilesSpinnerFragment.newInstance("Loeading plant profiles...");
+        mLoadingPlantProfilesDialog = LoadingPlantProfilesSpinnerFragment.newInstance("Loading plant profiles...");
         mLoadingPlantProfilesDialog.show(fm, "fragment_creating_plant_profile_spinner");
     }
 
@@ -209,5 +210,17 @@ public class JournalActivity extends AppCompatActivity{
         FragmentManager fm = getSupportFragmentManager();
         CreatePlantDialogFragment createPlantDialogFragment = CreatePlantDialogFragment.newInstance("New Plant Profile");
         createPlantDialogFragment.show(fm, "fragment_create_plant");
+    }
+
+    public void removePlantView(String plantID) {
+        final int childCount = mViewPager.getChildCount();
+
+        for (int i = 0; i < childCount; i++) {
+            final View view = mViewPager.getChildAt(i);
+            if (plantID.equals((String) view.getTag())) {
+                mCardAdapter.destroyItem(mViewPager, i, view);
+                break;
+            }
+        }
     }
 }
