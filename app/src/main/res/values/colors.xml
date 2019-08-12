@@ -10,4 +10,5 @@
     <color name="healthyGreen">#63C768</color>
     <color name="attentionOrange">#FF9800</color>
     <color name="urgentRed">#F44336</color>
+    <color name="darkRed">#c0392b</color>
 </resources>

@@ -52,7 +52,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 
@@ -70,6 +69,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
     private EditText mPlantBirthdayField;
     private ImageView mPlantTakeImageButton;
     private ImageView mPlantTakeImageThumbnail;
+    private TextView mPlantTakeImagePromptTextView;
     private String mCurrentImagePath;
     private Button mProfileSubmit;
     private Bitmap mCurrentImageBitmap;
@@ -94,7 +94,7 @@ public class CreatePlantDialogFragment extends DialogFragment {
         mProfileSubmit = rootView.findViewById(R.id.plant_profile_submit);
         mPlantTakeImageButton = rootView.findViewById(R.id.take_plant_image_button);
         mPlantTakeImageThumbnail = rootView.findViewById(R.id.take_plant_image_thumbnail);
-
+        mPlantTakeImagePromptTextView = rootView.findViewById(R.id.take_plant_image_prompt);
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
@@ -106,6 +106,9 @@ public class CreatePlantDialogFragment extends DialogFragment {
         mProfileSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            if (!validateForm()) {
+                return;
+            }
             showCreatingPlantProfileDialog();
             // Update plant in database
             String plantName = mPlantNameField.getText().toString();
@@ -113,49 +116,47 @@ public class CreatePlantDialogFragment extends DialogFragment {
             String plantBirthday = mPlantBirthdayField.getText().toString();
 
             Log.d(TAG, "createPlant:" + plantName + "/" + plantSpecies + "/" + plantBirthday);
-            if (!validateForm()) {
-                return;
-            }
+
             final FirebaseUser currentUser = mAuth.getCurrentUser();
             DatabaseReference plantsReference = mDatabaseReference.child("plants");
             Plant newPlant = new Plant(plantName, plantSpecies, plantBirthday, currentUser.getUid());
             plantsReference.push().setValue(newPlant, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError == null) {
-                        final String uniqueKey = databaseReference.getKey();
-                        // Upload image to Firebase Storage
-                        mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
-                        mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(uniqueKey + ".jpg");
-                        if (mCurrentImageBitmap != null) {
-                            Bitmap uploadBitmap = resize(mCurrentImageBitmap, 600, 800);
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                            uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
-                            byte[] data = baos.toByteArray();
+                if (databaseError == null) {
+                    final String uniqueKey = databaseReference.getKey();
+                    // Upload image to Firebase Storage
+                    mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(uniqueKey).setValue("");
+                    mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(uniqueKey + ".jpg");
+                    if (mCurrentImageBitmap != null) {
+                        Bitmap uploadBitmap = resize(mCurrentImageBitmap, 600, 800);
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        uploadBitmap.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+                        byte[] data = baos.toByteArray();
 
-                            UploadTask uploadTask = mStorageUploadedPlantProfileImageReference.putBytes(data);
-                            uploadTask.addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
-                                    // Handle unsuccessful uploads
-                                }
-                            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    mDatabaseReference.child("plants").child(uniqueKey).child("profileImageUrl").setValue(mStorageUploadedPlantProfileImageReference.getPath());
-                                    hideCreatingPlantProfileDialog();
-                                    getDialog().dismiss();
-                                }
-                            });
-                        }
-                        else {
-                            hideCreatingPlantProfileDialog();
-                            getDialog().dismiss();
-                        }
+                        UploadTask uploadTask = mStorageUploadedPlantProfileImageReference.putBytes(data);
+                        uploadTask.addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Handle unsuccessful uploads
+                            }
+                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                hideCreatingPlantProfileDialog();
+                                getDialog().dismiss();
+                                mDatabaseReference.child("plants").child(uniqueKey).child("profileImageUrl").setValue(mStorageUploadedPlantProfileImageReference.getPath());
+                            }
+                        });
                     }
                     else {
-                        Log.e(TAG, databaseError.toString());
+                        hideCreatingPlantProfileDialog();
+                        getDialog().dismiss();
                     }
+                }
+                else {
+                    Log.e(TAG, databaseError.toString());
+                }
                 }
             });
             }
@@ -304,6 +305,13 @@ public class CreatePlantDialogFragment extends DialogFragment {
             valid = false;
         } else {
             mPlantNameField.setError(null);
+        }
+
+        if (mPlantTakeImageThumbnail.getDrawable() == null) {
+            mPlantTakeImagePromptTextView.setError("Required.");
+            valid = false;
+        } else {
+            mPlantTakeImagePromptTextView.setError(null);
         }
 
         return valid;

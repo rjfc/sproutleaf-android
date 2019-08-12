@@ -17,6 +17,9 @@ import androidx.viewpager.widget.PagerAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -32,6 +35,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private float mBaseElevation;
 
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabaseReference;
     private FirebaseStorage mStorage;
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
@@ -69,6 +73,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         mAuth = FirebaseAuth.getInstance();
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance();
         mStorageReference = mStorage.getReference();
         mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
@@ -92,42 +97,55 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
         mViews.set(position, null);
+        container.setSaveFromParentEnabled(false);
+        notifyDataSetChanged();
     }
 
     private void bind(final PlantCardItem plant, final View view) {
+        final FirebaseUser currentUser = mAuth.getCurrentUser();
+
         TextView plantNameTextView = (TextView) view.findViewById(R.id.plant_name);
         TextView plantSpeciesTextView = (TextView) view.findViewById(R.id.plant_species);
         TextView plantBirthdayTextView = (TextView) view.findViewById(R.id.plant_birthday);
+        ImageView deletePlantProfileImageView = (ImageView) view.findViewById(R.id.delete_plant_profile_button);
 
         plantNameTextView.setText(plant.getPlantName());
         plantSpeciesTextView.setText(plant.getPlantSpecies());
         plantBirthdayTextView.setText(plant.getPlantBirthday());
         view.setTag(plant.getPlantID());
 
-        mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg");
-                final ImageView plantImageView = (ImageView) view.findViewById(R.id.plant_image);
+        mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg");
+        final ImageView plantImageView = (ImageView) view.findViewById(R.id.plant_image);
 
-                final long ONE_MEGABYTE = 1024 * 1024;
-                mStorageUploadedPlantProfileImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                    @Override
-                    public void onSuccess(byte[] bytes) {
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        plantImageView.setImageBitmap(bitmap);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
+        final long ONE_MEGABYTE = 1024 * 1024;
+        mStorageUploadedPlantProfileImageReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                plantImageView.setImageBitmap(bitmap);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
-                Log.d(TAG, "Plant image does not exist.");
+            }
+        });
+
+        // If delete plant button is clicked
+        deletePlantProfileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mStorageUploadedPlantProfileImageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(plant.getPlantID()).removeValue();
+                        mDatabaseReference.child("plants").child(plant.getPlantID()).removeValue();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         });
     }
