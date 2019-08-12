@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -43,6 +44,7 @@ public class PredictionResultActivity extends AppCompatActivity {
     private ImageView mCapturedImageView;
     private String mCapturedPhotoPath;
     private TextView mPredictionInfo;
+    private androidx.appcompat.widget.Toolbar mToolbar;
     private PredictingSpinnerFragment mPredictingDialog;
     private float[] mProbabilities;
 
@@ -54,10 +56,19 @@ public class PredictionResultActivity extends AppCompatActivity {
 
     @Override
     public void onStart() {
-        mCapturedImageView = findViewById(R.id.prediction_image);
-        mPredictionInfo = findViewById(R.id.prediction_info);
         super.onStart();
 
+        // Set member variables
+        mCapturedImageView = findViewById(R.id.prediction_image);
+        mPredictionInfo = findViewById(R.id.prediction_info);
+        mToolbar = findViewById(R.id.prediction_result_toolbar);
+
+        // Toolbar config
+        mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.darkerGrey, null));
+        mToolbar.setTitleTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null));
+        mToolbar.setTitle(getString(R.string.prediction_result_toolbar_text));
+        mToolbar.setTitleTextAppearance(this, R.style.ToolbarTextAppearance);
+        setSupportActionBar(mToolbar); // Set mToolbar as Action Bar
         showPredictingDialog();
 
         try{

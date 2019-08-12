@@ -7,6 +7,15 @@
     android:background="@color/darkGrey"
     tools:context=".PredictionResultActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/prediction_result_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <ImageView
         android:id="@+id/prediction_image"
         android:layout_width="wrap_content"

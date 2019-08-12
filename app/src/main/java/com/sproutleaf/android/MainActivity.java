@@ -30,14 +30,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Set member variables
-        mToolbar = findViewById(R.id.main_toolbar);
     }
 
     @Override
     public void onStart(){
         super.onStart();
+
+        // Set member variables
+        mToolbar = findViewById(R.id.main_toolbar);
 
         FirebaseUser user = mAuth.getCurrentUser();
         String displayName = user.getDisplayName();
