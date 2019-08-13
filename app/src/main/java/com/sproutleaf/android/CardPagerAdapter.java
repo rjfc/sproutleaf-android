@@ -1,5 +1,6 @@
 package com.sproutleaf.android;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -11,7 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -42,16 +45,17 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
     private StorageReference mStorageUploadedPlantProfileImageReference;
-    private int mIndex;
+    private Context mContext;
 
-    public CardPagerAdapter() {
+    public CardPagerAdapter(Context context) {
         mData = new ArrayList<>();
         mViews = new ArrayList<>();
+        mContext = context;
     }
 
     public void addCardItem(PlantCardItem plant) {
-        mViews.add(null);
         mData.add(plant);
+        mViews.add(null);
     }
 
     public float getBaseElevation() {
@@ -80,7 +84,6 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         mStorage = FirebaseStorage.getInstance();
         mStorageReference = mStorage.getReference();
         mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
-        mIndex = 0;
 
         View view = LayoutInflater.from(container.getContext())
                 .inflate(R.layout.adapter, container, false);
@@ -97,10 +100,14 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         return view;
     }
 
+    @Override public int getItemPosition(Object object) {
+        int index = mViews.indexOf(object);
+        return index == -1 ? POSITION_NONE : index;
+    }
+
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-       // container.removeView((View) object);
-        mViews.remove(position);
+        container.removeView((View) object);
         notifyDataSetChanged();
     }
 

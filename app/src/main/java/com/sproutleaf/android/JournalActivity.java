@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -44,11 +45,10 @@ public class JournalActivity extends AppCompatActivity{
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
     private ChildEventListener plantChildEventListener;
+    private LoadingPlantProfilesSpinnerFragment mLoadingPlantProfilesDialog;
     private Context mContext;
     private boolean imageFound;
 
-
-    private LoadingPlantProfilesSpinnerFragment mLoadingPlantProfilesDialog;
     private static CardPagerAdapter mCardAdapter;
     private ShadowTransformer mCardShadowTransformer;
 
@@ -68,8 +68,6 @@ public class JournalActivity extends AppCompatActivity{
         mContext = getApplicationContext();
         mToolbar = findViewById(R.id.journal_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
-        mCardAdapter = new CardPagerAdapter();
-        mCardShadowTransformer = new ShadowTransformer(mViewPager, mCardAdapter);
         mDeletePlantProfileImageView = findViewById(R.id.delete_plant_profile_button);
     }
 
@@ -78,6 +76,11 @@ public class JournalActivity extends AppCompatActivity{
         super.onStart();
         final FirebaseUser currentUser = mAuth.getCurrentUser();
         String displayName = currentUser.getDisplayName();
+
+        // Initialize CardPagerAdapter every time activity is started
+        mCardAdapter = new CardPagerAdapter(mContext);
+        mCardShadowTransformer = new ShadowTransformer(mViewPager, mCardAdapter);
+
         // Toolbar config
         mToolbar.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.darkerGrey, null));
         mToolbar.setTitleTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimaryDark, null));
@@ -91,14 +94,28 @@ public class JournalActivity extends AppCompatActivity{
         mViewPager.setOffscreenPageLimit(100); // TODO: set limit on how many plants a user can make
 
         // TabLayout config
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
-        tabLayout.setupWithViewPager(mViewPager, true);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
+                tabLayout.setupWithViewPager(mViewPager, true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         // On page load
         mDatabaseReference.child("plants").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //showLoadingPlantProfilesDialog();
                 for (final DataSnapshot plantSnapshot : dataSnapshot.getChildren()) {
                     // Parse the snapshot to local model
                     Plant plant = plantSnapshot.getValue(Plant.class);
@@ -122,7 +139,6 @@ public class JournalActivity extends AppCompatActivity{
                         }
                     }
                 }
-                // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
             }
 
             @Override
@@ -140,15 +156,12 @@ public class JournalActivity extends AppCompatActivity{
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                //showLoadingPlantProfilesDialog();
                 final Plant plant = dataSnapshot.getValue(Plant.class);
                 if (plant.getUserID().equals(currentUser.getUid())) {
                     final int childCount = mViewPager.getChildCount();
                     alreadyInList = false;
-                    Log.d("plant", Boolean.toString(alreadyInList));
                     for (int i = 0; i < childCount; i++) {
                         final View view = mViewPager.getChildAt(i);
-                        Log.d("plants", dataSnapshot.getKey() + " | " + (String) view.getTag());
                         if (dataSnapshot.getKey().equals((String) view.getTag())) {
                             alreadyInList = true;
                             break;
@@ -156,7 +169,6 @@ public class JournalActivity extends AppCompatActivity{
                     }
 
                     if (!alreadyInList) {
-                        Log.d("plant", "created card");
                         // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
                         mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), dataSnapshot.getKey()));
                         mCardAdapter.notifyDataSetChanged();
@@ -182,22 +194,12 @@ public class JournalActivity extends AppCompatActivity{
             // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
         });
     }
+
     @Override
     protected void onPause() {
         //this should be before super
         super.onPause();
         removePlantChildEventListener();
-    }
-    // Create dialog instance
-    private void showLoadingPlantProfilesDialog() {
-        FragmentManager fm = this.getSupportFragmentManager();
-        mLoadingPlantProfilesDialog = LoadingPlantProfilesSpinnerFragment.newInstance("Loading plant profiles...");
-        mLoadingPlantProfilesDialog.show(fm, "fragment_creating_plant_profile_spinner");
-    }
-
-    // Hide dialog
-    private void hideLoadingPlantProfilesDialog() {
-        mLoadingPlantProfilesDialog.dismissDialog();
     }
 
     // Remove listener for database plant children to make sure it only fires once per child
@@ -213,8 +215,7 @@ public class JournalActivity extends AppCompatActivity{
     }
 
     public void removePlantView(String plantID) {
-        final int childCount = mViewPager.getChildCount();
-
+        final int childCount = mViewPager.getChildCount();;
         for (int i = 0; i < childCount; i++) {
             final View view = mViewPager.getChildAt(i);
             if (plantID.equals((String) view.getTag())) {
@@ -223,4 +224,15 @@ public class JournalActivity extends AppCompatActivity{
             }
         }
     }
+    public void showLoadingPlantProfilesDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        mLoadingPlantProfilesDialog = LoadingPlantProfilesSpinnerFragment.newInstance("Loading plant profiles...");
+        mLoadingPlantProfilesDialog.show(fm, "fragment_creating_plant_profile_spinner");
+    }
+
+    // Hide dialog
+    public void hideLoadingPlantProfilesDialog() {
+        mLoadingPlantProfilesDialog.dismissDialog();
+    }
+
 }
