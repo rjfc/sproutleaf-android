@@ -69,6 +69,9 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
         mToolbar = findViewById(R.id.journal_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mDeletePlantProfileImageView = findViewById(R.id.delete_plant_profile_button);
+
+        mCardAdapter = new CardPagerAdapter(this);
+        mViewPager.setAdapter(mCardAdapter);
     }
 
     @Override
@@ -78,7 +81,6 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
         String displayName = currentUser.getDisplayName();
 
         // Initialize CardPagerAdapter every time activity is started
-        mCardAdapter = new CardPagerAdapter(this);
         mCardShadowTransformer = new ShadowTransformer(mViewPager, mCardAdapter);
 
         // Toolbar config
@@ -89,7 +91,6 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
         setSupportActionBar(mToolbar); // Set mToolbar as Action Bar
 
         // ViewPager config
-        mViewPager.setAdapter(mCardAdapter);
         mViewPager.setPageTransformer(false, mCardShadowTransformer);
         mViewPager.setOffscreenPageLimit(100); // TODO: set limit on how many plants a user can make
 
@@ -216,12 +217,12 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
     }
 
     public void removePlantView(String plantID) {
-        Log.d("card", "remove plant view called");
        final int childCount = mViewPager.getChildCount();;
         for (int i = 0; i < childCount; i++) {
             final View view = mViewPager.getChildAt(i);
             if (plantID.equals((String) view.getTag())) {
                 mCardAdapter.destroyItem(mViewPager, i, view);
+                mCardAdapter.notifyDataSetChanged();
                 break;
             }
         }

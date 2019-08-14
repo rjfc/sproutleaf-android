@@ -117,7 +117,14 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        Log.d("card", "destroy item called");
+        // Scroll onto a different Card before deleting
+        if (container.getChildCount() > 1) {
+            if (position > 0) {
+                ((ViewPager) container).setCurrentItem(position - 1);
+            } else {
+                ((ViewPager) container).setCurrentItem(position + 1);
+            }
+        }
         container.removeView((View) object);
         mData.remove(position);
         notifyDataSetChanged();
@@ -171,10 +178,10 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         deletePlantProfileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                Log.d("card", "clicked");
                 mStorageUploadedPlantProfileImageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("card", "delete button clicked");
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(plant.getPlantID()).removeValue();
                         mDatabaseReference.child("plants").child(plant.getPlantID()).removeValue();
                         JournalActivity ja = new JournalActivity();
