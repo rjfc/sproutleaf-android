@@ -22,8 +22,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -39,18 +42,21 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private List<PlantCardItem> mData;
     private float mBaseElevation;
 
+    private LoadingPlantProfilesSpinnerInterface LoadingPlantProfilesSpinnerInterfaceListener;
+
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
     private FirebaseStorage mStorage;
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
     private StorageReference mStorageUploadedPlantProfileImageReference;
-    private Context mContext;
+    private boolean refresh;
 
-    public CardPagerAdapter(Context context) {
+    public CardPagerAdapter(LoadingPlantProfilesSpinnerInterface LoadingPlantProfilesSpinnerInterfaceListener) {
+    //    LoadingPlantProfilesSpinnerInterfaceListener.showLoadingPlantProfilesDialog();
         mData = new ArrayList<>();
         mViews = new ArrayList<>();
-        mContext = context;
+        this.LoadingPlantProfilesSpinnerInterfaceListener = LoadingPlantProfilesSpinnerInterfaceListener;
     }
 
     public void addCardItem(PlantCardItem plant) {
@@ -101,13 +107,19 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     }
 
     @Override public int getItemPosition(Object object) {
-        int index = mViews.indexOf(object);
-        return index == -1 ? POSITION_NONE : index;
+        if(refresh){
+            refresh = false;
+            return POSITION_NONE;
+        }else{
+            return super.getItemPosition(object);
+        }
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        Log.d("card", "destroy item called");
         container.removeView((View) object);
+        mData.remove(position);
         notifyDataSetChanged();
     }
 
@@ -133,6 +145,21 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 plantImageView.setImageBitmap(bitmap);
+                /*mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            if (child.getKey().equals(plant.getPlantID())) {
+                                LoadingPlantProfilesSpinnerInterfaceListener.hideLoadingPlantProfilesDialog();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });*/
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -147,6 +174,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
                 mStorageUploadedPlantProfileImageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        Log.d("card", "delete button clicked");
                         mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").child(plant.getPlantID()).removeValue();
                         mDatabaseReference.child("plants").child(plant.getPlantID()).removeValue();
                         JournalActivity ja = new JournalActivity();
@@ -160,5 +188,10 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
                 });
             }
         });
+    }
+
+    public void refreshAdapter(){
+        refresh = true;
+        notifyDataSetChanged();
     }
 }

@@ -33,7 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class JournalActivity extends AppCompatActivity{
+public class JournalActivity extends AppCompatActivity implements LoadingPlantProfilesSpinnerInterface {
     private static final String TAG = JournalActivity.class.getName();
     private boolean alreadyInList;
     private FirebaseAuth mAuth;
@@ -78,7 +78,7 @@ public class JournalActivity extends AppCompatActivity{
         String displayName = currentUser.getDisplayName();
 
         // Initialize CardPagerAdapter every time activity is started
-        mCardAdapter = new CardPagerAdapter(mContext);
+        mCardAdapter = new CardPagerAdapter(this);
         mCardShadowTransformer = new ShadowTransformer(mViewPager, mCardAdapter);
 
         // Toolbar config
@@ -93,11 +93,14 @@ public class JournalActivity extends AppCompatActivity{
         mViewPager.setPageTransformer(false, mCardShadowTransformer);
         mViewPager.setOffscreenPageLimit(100); // TODO: set limit on how many plants a user can make
 
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
+        tabLayout.setupWithViewPager(mViewPager, true);
+
         // TabLayout config
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
@@ -108,10 +111,8 @@ public class JournalActivity extends AppCompatActivity{
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
         });
-
         // On page load
         mDatabaseReference.child("plants").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -215,7 +216,8 @@ public class JournalActivity extends AppCompatActivity{
     }
 
     public void removePlantView(String plantID) {
-        final int childCount = mViewPager.getChildCount();;
+        Log.d("card", "remove plant view called");
+       final int childCount = mViewPager.getChildCount();;
         for (int i = 0; i < childCount; i++) {
             final View view = mViewPager.getChildAt(i);
             if (plantID.equals((String) view.getTag())) {
@@ -234,5 +236,4 @@ public class JournalActivity extends AppCompatActivity{
     public void hideLoadingPlantProfilesDialog() {
         mLoadingPlantProfilesDialog.dismissDialog();
     }
-
 }
