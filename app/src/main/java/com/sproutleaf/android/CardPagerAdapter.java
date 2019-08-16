@@ -60,8 +60,8 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     }
 
     public void addCardItem(PlantCardItem plant) {
-        mData.add(plant);
         mViews.add(null);
+        mData.add(plant);
     }
 
     public float getBaseElevation() {
@@ -126,7 +126,8 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
             }
         }
         container.removeView((View) object);
-        mData.remove(position);
+//        mData.remove(position); // INSPECT THIS - SEEMS TO BE REMOVING PAGE BUT SHOULD BE SHIFTED MAYBE? LOOK AT INSTANTIATEITEM
+        mViews.set(position, null);
         notifyDataSetChanged();
     }
 

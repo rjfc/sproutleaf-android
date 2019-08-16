@@ -1,5 +1,6 @@
 package com.sproutleaf.android;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -137,7 +138,6 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
                             // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
                             mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), plantSnapshot.getKey()));
                             mCardAdapter.notifyDataSetChanged();
-                            plant = null;
                         }
                     }
                 }
@@ -181,7 +181,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
+                recreate();
             }
 
             @Override
@@ -204,9 +204,17 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
         removePlantChildEventListener();
     }
 
+    @Override
+    public void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        mCardAdapter = new CardPagerAdapter(this);
+        mViewPager.setAdapter(mCardAdapter);
+    }
+
     // Remove listener for database plant children to make sure it only fires once per child
     private void removePlantChildEventListener () {
-        mDatabaseReference.child("plants").removeEventListener(plantChildEventListener);
+       // mDatabaseReference.child("plants").removeEventListener(plantChildEventListener);
     }
 
     // Create a new plant
@@ -217,7 +225,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
     }
 
     public void removePlantView(String plantID) {
-       final int childCount = mViewPager.getChildCount();;
+        final int childCount = mViewPager.getChildCount();;
         for (int i = 0; i < childCount; i++) {
             final View view = mViewPager.getChildAt(i);
             if (plantID.equals((String) view.getTag())) {
@@ -227,6 +235,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
             }
         }
     }
+
     public void showLoadingPlantProfilesDialog() {
         FragmentManager fm = getSupportFragmentManager();
         mLoadingPlantProfilesDialog = LoadingPlantProfilesSpinnerFragment.newInstance("Loading plant profiles...");
@@ -237,4 +246,5 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
     public void hideLoadingPlantProfilesDialog() {
         mLoadingPlantProfilesDialog.dismissDialog();
     }
+
 }

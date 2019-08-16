@@ -5,7 +5,6 @@ import android.view.View;
 import androidx.cardview.widget.CardView;
 import androidx.viewpager.widget.ViewPager;
 
-
 public class ShadowTransformer implements ViewPager.OnPageChangeListener, ViewPager.PageTransformer {
 
     private ViewPager mViewPager;
