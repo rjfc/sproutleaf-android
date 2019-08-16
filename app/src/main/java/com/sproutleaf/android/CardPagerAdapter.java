@@ -179,7 +179,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         deletePlantProfileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                Log.d("card", "clicked");
+                mStorageUploadedPlantProfileImageReference = mStoragePlantProfileImagesReference.child(plant.getPlantID() + ".jpg"); // Need to set it again for some reason
                 mStorageUploadedPlantProfileImageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
