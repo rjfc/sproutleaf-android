@@ -95,9 +95,11 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
         mViewPager.setPageTransformer(false, mCardShadowTransformer);
         mViewPager.setOffscreenPageLimit(100); // TODO: set limit on how many plants a user can make
 
-
+        // Tab Dots layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabDots);
         tabLayout.setupWithViewPager(mViewPager, true);
+
+        //showLoadingPlantProfilesDialog();
 
         // TabLayout config
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -193,7 +195,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-            // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
+           // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
         });
     }
 

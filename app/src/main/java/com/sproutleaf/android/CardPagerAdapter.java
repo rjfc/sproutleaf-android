@@ -153,7 +153,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 plantImageView.setImageBitmap(bitmap);
-                /*mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").addListenerForSingleValueEvent(new ValueEventListener() {
+              /*  mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot child : dataSnapshot.getChildren()) {
