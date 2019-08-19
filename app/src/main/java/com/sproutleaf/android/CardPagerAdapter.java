@@ -1,6 +1,7 @@
 package com.sproutleaf.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -134,6 +135,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
     private void bind(final PlantCardItem plant, final View view) {
         final FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        CardView cardView = (CardView) view.findViewById(R.id.cardView);
         TextView plantNameTextView = (TextView) view.findViewById(R.id.plant_name);
         TextView plantSpeciesTextView = (TextView) view.findViewById(R.id.plant_species);
         TextView plantBirthdayTextView = (TextView) view.findViewById(R.id.plant_birthday);
@@ -194,6 +196,16 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
                         e.printStackTrace();
                     }
                 });
+            }
+        });
+
+        // If CardView is clicked
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                Intent intent = new Intent( view.getContext(), PlantProfileActivity.class);
+                intent.putExtra("plantKey", plant.getPlantID()); //Optional parameters
+                view.getContext().startActivity(intent);
             }
         });
     }

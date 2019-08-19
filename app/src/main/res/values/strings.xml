@@ -43,5 +43,5 @@
     <string name="creating_plant_profile_spinner_text">Creating plant profile…</string>
     <string name="loading_plant_profiles_spinner_text">Loading plants…</string>
     <string name="prediction_result_toolbar_text">Prediction Result</string>
-
+    <string name="plant_profile_toolbar_text">Editing %1$s Plant Profile</string>
 </resources>
