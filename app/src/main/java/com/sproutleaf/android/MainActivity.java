@@ -22,7 +22,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
-    private String mCurrentPhotoPath;
+    private String mCurrentImagePath;
     private androidx.appcompat.widget.Toolbar mToolbar;
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
+        mCurrentImagePath = image.getAbsolutePath();
         return image;
     }
 
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             // Send path as intent
             Intent intent = new Intent(this, PredictionResultActivity.class);
-            intent.putExtra("capturedPhotoPath", mCurrentPhotoPath);
+            intent.putExtra("capturedPhotoPath", mCurrentImagePath);
             startActivity(intent);
         }
     }
@@ -117,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mCurrentPhotoPath != null) {
-            outState.putString("cameraImageUri", mCurrentPhotoPath);
+        if (mCurrentImagePath != null) {
+            outState.putString("cameraImageUri", mCurrentImagePath);
         }
     }
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState.containsKey("cameraImageUri")) {
-            mCurrentPhotoPath = Uri.parse(savedInstanceState.getString("cameraImageUri")).toString();
+            mCurrentImagePath = Uri.parse(savedInstanceState.getString("cameraImageUri")).toString();
         }
     }
 
