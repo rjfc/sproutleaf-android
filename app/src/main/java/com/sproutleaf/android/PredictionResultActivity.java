@@ -6,18 +6,25 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,9 +40,13 @@ import com.google.firebase.ml.custom.FirebaseModelInputs;
 import com.google.firebase.ml.custom.FirebaseModelInterpreter;
 import com.google.firebase.ml.custom.FirebaseModelOptions;
 import com.google.firebase.ml.custom.FirebaseModelOutputs;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 public class PredictionResultActivity extends AppCompatActivity {
     private static final String TAG = PredictionResultActivity.class.getName();
@@ -71,7 +82,28 @@ public class PredictionResultActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar); // Set mToolbar as Action Bar
         showPredictingDialog();
 
-        try{
+        Intent intent = getIntent();
+        mCapturedPhotoPath = intent.getStringExtra("capturedPhotoPath");
+        Glide.with(this)
+                .asBitmap()
+                .load(mCapturedPhotoPath)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        mCapturedImageView.setImageBitmap(resource);
+                        try {
+                            runInference(resource);
+                        } catch (FirebaseMLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                    }
+                });
+
+       /* try{
             // Get path intent and set image view to image
             Intent intent = getIntent();
             mCapturedPhotoPath = intent.getStringExtra("capturedPhotoPath");
@@ -83,7 +115,7 @@ public class PredictionResultActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (FirebaseMLException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     // Configure model hosted with Firebase
@@ -194,17 +226,17 @@ public class PredictionResultActivity extends AppCompatActivity {
         if (probabilities[0] >= 0.99999) {
             // Doing great
             mPredictionInfo.setText(String.format(getString(R.string.prediction_info_text_healthy), displayName));
-            mPredictionInfo.setTextColor(getResources().getColor(R.color.healthyGreen, null));
+            mPredictionInfo.setTextColor(ContextCompat.getColor(this, R.color.attentionOrange));
         }
         else if (probabilities[0] >= 0.8 && probabilities[0] < 0.99999) {
             // Could be better
             mPredictionInfo.setText(getString(R.string.prediction_info_text_attention));
-            mPredictionInfo.setTextColor(getResources().getColor(R.color.attentionOrange, null));
+            mPredictionInfo.setTextColor(ContextCompat.getColor(this, R.color.attentionOrange));
         }
         else if (probabilities[0] < 0.8) {
             // In need of urgent help
             mPredictionInfo.setText(getString(R.string.prediction_info_text_urgent));
-            mPredictionInfo.setTextColor(getResources().getColor(R.color.urgentRed, null));
+            mPredictionInfo.setTextColor(ContextCompat.getColor(this, R.color.urgentRed));
         }
         hidePredictingDialog();
     }

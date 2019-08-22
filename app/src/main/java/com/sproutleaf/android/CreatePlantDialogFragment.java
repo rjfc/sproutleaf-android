@@ -11,6 +11,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,9 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +47,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -219,21 +224,29 @@ public class CreatePlantDialogFragment extends DialogFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_TAKE_PHOTO) {
-                try {
-                    // Only resize when image added
-                    int heightInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 126, getResources().getDisplayMetrics());
-                    int widthInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, getResources().getDisplayMetrics());
-                    mPlantTakeImageThumbnail.getLayoutParams().height = heightInDp;
-                    mPlantTakeImageThumbnail.getLayoutParams().width = widthInDp;
-                    mPlantTakeImageThumbnail.requestLayout();
+                // Only resize when image added
+                int heightInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 126, getResources().getDisplayMetrics());
+                int widthInDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, getResources().getDisplayMetrics());
+                mPlantTakeImageThumbnail.getLayoutParams().height = heightInDp;
+                mPlantTakeImageThumbnail.getLayoutParams().width = widthInDp;
+                mPlantTakeImageThumbnail.requestLayout();
+                Glide.with(this)
+                        .asBitmap()
+                        .load(mCurrentImagePath)
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                mCurrentImageBitmap = resource;
+                                mPlantTakeImageThumbnail.setImageBitmap(mCurrentImageBitmap);
+                            }
 
-                    mCurrentImageBitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContext().getContentResolver(), Uri.fromFile(new File(mCurrentImagePath))));
-                    mPlantTakeImageThumbnail.setImageBitmap(mCurrentImageBitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                            }
+                        });
             }
         }
+
     }
     // Create image file of captured plant
     private File createImageFile() throws IOException {

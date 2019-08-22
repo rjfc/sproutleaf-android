@@ -203,9 +203,9 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                Intent intent = new Intent( view.getContext(), PlantProfileActivity.class);
+              /*  Intent intent = new Intent( view.getContext(), PlantProfileActivity.class);
                 intent.putExtra("plantKey", plant.getPlantID()); //Optional parameters
-                view.getContext().startActivity(intent);
+                view.getContext().startActivity(intent);*/
             }
         });
     }

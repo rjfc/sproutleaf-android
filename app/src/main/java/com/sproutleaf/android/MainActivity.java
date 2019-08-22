@@ -114,6 +114,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mCurrentPhotoPath != null) {
+            outState.putString("cameraImageUri", mCurrentPhotoPath);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState.containsKey("cameraImageUri")) {
+            mCurrentPhotoPath = Uri.parse(savedInstanceState.getString("cameraImageUri")).toString();
+        }
+    }
+
     public void logOut(View view) {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(this, AuthenticationActivity.class);
