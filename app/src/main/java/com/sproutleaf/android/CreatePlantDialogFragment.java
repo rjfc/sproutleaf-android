@@ -90,6 +90,15 @@ public class CreatePlantDialogFragment extends DialogFragment {
         return frag;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("cameraImageUri")) {
+                mCurrentImagePath = Uri.parse(savedInstanceState.getString("cameraImageUri")).toString();
+            }
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -217,12 +226,6 @@ public class CreatePlantDialogFragment extends DialogFragment {
                 }
             }
         });
-
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("cameraImageUri")) {
-                mCurrentImagePath = Uri.parse(savedInstanceState.getString("cameraImageUri")).toString();
-            }
-        }
 
         return rootView;
     }

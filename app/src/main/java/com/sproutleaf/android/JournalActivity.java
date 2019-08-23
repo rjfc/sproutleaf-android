@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
@@ -46,6 +48,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
     private ChildEventListener plantChildEventListener;
+    private Fragment mCreatePlantDialogFragment;
     private LoadingPlantProfilesSpinnerFragment mLoadingPlantProfilesDialog;
     private Context mContext;
     private boolean imageFound;
@@ -73,6 +76,11 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
 
         mCardAdapter = new CardPagerAdapter(this);
         mViewPager.setAdapter(mCardAdapter);
+
+        if (savedInstanceState != null) {
+            //Restore the fragment's instance
+            mCreatePlantDialogFragment = getSupportFragmentManager().getFragment(savedInstanceState, "createPlantDialogFragment");
+        }
     }
 
     @Override
@@ -179,6 +187,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
                         removePlantChildEventListener();
                     }
                 }
+                recreate();
             }
 
             @Override
@@ -197,6 +206,16 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
             }
            // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        //Save the fragment's instance
+        if (mCreatePlantDialogFragment != null) {
+            getSupportFragmentManager().putFragment(outState, "createPlantDialogFragment", mCreatePlantDialogFragment);
+        }
     }
 
     @Override

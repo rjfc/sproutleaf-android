@@ -1,11 +1,8 @@
 package com.sproutleaf.android;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -23,11 +18,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -155,21 +147,6 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
             public void onSuccess(byte[] bytes) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                 plantImageView.setImageBitmap(bitmap);
-              /*  mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            if (child.getKey().equals(plant.getPlantID())) {
-                                LoadingPlantProfilesSpinnerInterfaceListener.hideLoadingPlantProfilesDialog();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });*/
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -203,9 +180,9 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-              /*  Intent intent = new Intent( view.getContext(), PlantProfileActivity.class);
+                Intent intent = new Intent( view.getContext(), EditPlantProfileActivity.class);
                 intent.putExtra("plantKey", plant.getPlantID()); //Optional parameters
-                view.getContext().startActivity(intent);*/
+                view.getContext().startActivity(intent);
             }
         });
     }
