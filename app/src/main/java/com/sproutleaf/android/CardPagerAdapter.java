@@ -186,9 +186,4 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
             }
         });
     }
-
-    public void refreshAdapter(){
-        refresh = true;
-        notifyDataSetChanged();
-    }
 }

@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +24,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jakewharton.rxbinding.widget.RxTextView;
+
+import java.util.concurrent.TimeUnit;
+
+import rx.functions.Action1;
 
 public class EditPlantProfileActivity extends AppCompatActivity {
     private String mPlantKey;
@@ -33,6 +41,7 @@ public class EditPlantProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabaseReference;
+    private DatabaseReference mDatabasePlantsReference;
     private FirebaseStorage mStorage;
     private StorageReference mStorageReference;
     private StorageReference mStoragePlantProfileImagesReference;
@@ -46,6 +55,7 @@ public class EditPlantProfileActivity extends AppCompatActivity {
         // Initialize Firebase variables
         mAuth = FirebaseAuth.getInstance();
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mDatabasePlantsReference = FirebaseDatabase.getInstance().getReference().child("plants");
         mStorage = FirebaseStorage.getInstance();
         mStorageReference = mStorage.getReference();
         mStoragePlantProfileImagesReference = mStorageReference.child("user").child(mAuth.getCurrentUser().getUid()).child("plant-profile-images");
@@ -56,11 +66,6 @@ public class EditPlantProfileActivity extends AppCompatActivity {
         mPlantSpeciesTextView = findViewById(R.id.plant_species);
         mPlantBirthdayTextView = findViewById(R.id.plant_birthday);
         mPlantImageView = findViewById(R.id.plant_image);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
         // Get path intent and set image view to image
         Intent intent = getIntent();
@@ -106,7 +111,19 @@ public class EditPlantProfileActivity extends AppCompatActivity {
         mToolbar.setTitleTextAppearance(this, R.style.ToolbarTextAppearance);
         setSupportActionBar(mToolbar); // Set mToolbar as Action Bar
 
+        RxTextView.textChanges(mPlantSpeciesTextView)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .subscribe(new Action1<CharSequence>() {
+                    @Override
+                    public void call(CharSequence textChanged) {
+                        mDatabasePlantsReference.child(mPlantKey).child("plantSpecies").setValue(textChanged.toString());
+                    }
+                });
 
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 }
