@@ -20,6 +20,10 @@ android {
     aaptOptions {
         noCompress "tflite"  // Do not compress .tflite file
     }
+
+    dexOptions {// Prevent OutOfMemory with MultiDex during the build phase
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {
@@ -48,5 +52,6 @@ allprojects {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
 }
+
 
 apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin
