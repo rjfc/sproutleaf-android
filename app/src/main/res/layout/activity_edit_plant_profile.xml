@@ -8,7 +8,7 @@
     android:background="@color/darkGrey">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/plant_profile_toolbar"
+        android:id="@+id/edit_plant_profile_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -16,10 +16,25 @@
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></androidx.appcompat.widget.Toolbar>
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/edit_plant_profile_save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="updatePlantProfile"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_plant_profile_toolbar"
+        app:layout_constraintEnd_toEndOf="@+id/edit_plant_profile_toolbar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_check_green_24dp" />
 
     <TextView
-        android:id="@+id/plant_name"
+        android:id="@+id/edit_plant_name"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,25 +46,25 @@
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/plant_profile_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_plant_profile_toolbar" />
 
     <EditText
-        android:id="@+id/plant_species"
+        android:id="@+id/edit_plant_species"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Species"
+        android:fontFamily="@font/lato"
+        android:hint="@string/edit_plant_profile_species_hint_text"
         android:textSize="18sp"
         android:textStyle="italic"
-        android:background="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/plant_name" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_plant_name" />
 
     <ImageView
-        android:id="@+id/plant_image"
+        android:id="@+id/edit_plant_image"
         android:layout_width="210dp"
         android:layout_height="250dp"
         android:layout_gravity="bottom|center"
@@ -60,37 +75,39 @@
         android:src="@drawable/placeholder_loading_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/plant_species" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_plant_species" />
 
     <TextView
-        android:id="@+id/plant_birthday"
+        android:id="@+id/edit_plant_birthday"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="60dp"
-        android:text="Born on date"
+        android:fontFamily="@font/lato"
+        android:text="@string/edit_plant_profile_birthday_no_exist_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/plant_image" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_plant_image" />
 
     <TextView
-        android:id="@+id/plant_notes_header"
+        android:id="@+id/edit_plant_notes_header"
         style="@style/TextAppearance.AppCompat.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
         android:layout_marginLeft="60dp"
         android:layout_marginTop="16dp"
-        android:text="Notes"
+        android:fontFamily="@font/lato"
+        android:text="@string/edit_plant_profile_notes_header_text"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/plant_birthday" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_plant_birthday" />
 
     <EditText
-        android:id="@+id/plant_notes"
+        android:id="@+id/edit_plant_notes"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="60dp"
@@ -101,12 +118,14 @@
         android:layout_marginBottom="24dp"
         android:background="@null"
         android:ems="10"
+        android:fontFamily="@font/lato"
         android:gravity="start|top"
-        android:hint="No notes yet"
-        android:inputType="textMultiLine"
+        android:hint="@string/edit_plant_profile_notes_hint_text"
+        android:inputType="textMultiLine|textCapSentences"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/plant_notes_header" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_plant_notes_header" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,11 +26,11 @@
             android:background="@drawable/circle_button_red"
             android:gravity="center"
             android:padding="5dp"
-            android:src="@drawable/ic_close_white_24dp"
+            app:srcCompat="@drawable/ic_close_white_24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginRight="8dp" />
-
+s
         <TextView
             android:id="@+id/plant_name"
             style="@style/TextAppearance.AppCompat.Title"
@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:fontFamily="@font/lato"
             android:text="Species"
             android:textSize="18sp"
             android:textStyle="italic"
@@ -68,7 +69,8 @@
             android:layout_marginStart="60dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="60dp"
-            android:text="Born on date"
+            android:fontFamily="@font/lato"
+            android:text="@string/plant_profile_birthday_no_exist_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/plant_image" />
@@ -86,6 +88,37 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/plant_species" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/darkerGrey"
+            app:layout_constraintBottom_toTopOf="@+id/plant_tap_indicator"
+            app:layout_constraintHorizontal_bias="0.0"
+            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/plant_tap_indicator"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/lato"
+            android:text="@string/plant_tap_indicator_text"
+            android:textColor="@color/darkGrey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            custom:layout_constraintEnd_toEndOf="parent"
+            custom:layout_constraintStart_toStartOf="parent"
+            android:layout_marginRight="60dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

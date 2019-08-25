@@ -1,5 +1,6 @@
 package com.sproutleaf.android;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -183,6 +184,7 @@ public class CardPagerAdapter extends PagerAdapter implements CardAdapter {
                 Intent intent = new Intent( view.getContext(), EditPlantProfileActivity.class);
                 intent.putExtra("plantKey", plant.getPlantID()); //Optional parameters
                 view.getContext().startActivity(intent);
+                ((Activity) view.getContext()).finish();
             }
         });
     }

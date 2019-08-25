@@ -27,7 +27,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/give_name_field"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        android:layout_marginLeft="16dp" />
 
     <TextView
         android:id="@+id/give_plant_name_prompt"
@@ -71,6 +72,7 @@
         app:layout_constraintHorizontal_bias="0.158"
         app:layout_constraintStart_toEndOf="@+id/give_name_field"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/sproutleaf_logo_icon" />
+        app:srcCompat="@drawable/sproutleaf_logo_icon"
+        android:layout_marginRight="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
