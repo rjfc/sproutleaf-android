@@ -50,4 +50,5 @@
     <string name="edit_plant_profile_notes_header_text">Notes</string>
     <string name="edit_plant_profile_notes_hint_text">No notes yet</string>
     <string name="plant_tap_indicator_text">Tap for more</string>
+    <string name="journal_empty_text">Either you have no plant profiles or they are loading. If it takes too long, try to reopen this page.</string>
 </resources>

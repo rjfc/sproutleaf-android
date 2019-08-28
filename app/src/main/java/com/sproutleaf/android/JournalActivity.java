@@ -161,7 +161,7 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
         });
 
         // If change in plant database is detected, check if there was a new plant created by current user
-        plantChildEventListener = mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").addChildEventListener (new ChildEventListener() {
+      /*  plantChildEventListener = mDatabaseReference.child("users").child(currentUser.getUid()).child("plants").addChildEventListener (new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
 
@@ -196,6 +196,54 @@ public class JournalActivity extends AppCompatActivity implements LoadingPlantPr
 
                     }
                 });
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                recreate();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+            // hideLoadingPlantProfilesDialog(); // TODO: make this show after images loaded
+        });
+    }*/
+        // If change in plant database is detected, check if there was a new plant created by current user
+        plantChildEventListener = mDatabaseReference.child("plants").addChildEventListener (new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                final Plant plant = dataSnapshot.getValue(Plant.class);
+                if (plant.getUserID().equals(currentUser.getUid())) {
+                    final int childCount = mViewPager.getChildCount();
+                    alreadyInList = false;
+                    for (int i = 0; i < childCount; i++) {
+                        final View view = mViewPager.getChildAt(i);
+                        if (dataSnapshot.getKey().equals(view.getTag())) {
+                            alreadyInList = true;
+                            break;
+                        }
+                    }
+
+                    if (!alreadyInList) {
+                        // Initialize a new PlantCardItem (separate object from PlantCard because we need to get the plant ID to prevent multiple of the same plant profile cards from appearing)
+                        mCardAdapter.addCardItem(new PlantCardItem(plant.getPlantName(), plant.getPlantSpecies(), String.format(getString(R.string.plant_card_birthday), plant.getPlantBirthday()), currentUser.getUid(), dataSnapshot.getKey()));
+                        mCardAdapter.notifyDataSetChanged();
+                        removePlantChildEventListener();
+                    }
+                    recreate();
+                }
             }
 
             @Override
